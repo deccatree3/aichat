@@ -1,0 +1,25 @@
+<!doctype html>
+<meta charset="utf-8">
+<style>
+  html, body { margin: 0; background: #111; }
+  video { width: 100vw; height: 100vh; object-fit: contain; background: #000; }
+  #status { position: fixed; left: 8px; top: 8px; color: #fff; font: 14px system-ui; background: rgba(0,0,0,.65); padding: 6px 8px; border-radius: 6px; }
+</style>
+<video id="v" muted playsinline preload="auto"></video>
+<div id="status">loading</div>
+<script>
+  const params = new URLSearchParams(location.search)
+  const t = Number(params.get('t') || 0)
+  const v = document.getElementById('v')
+  const status = document.getElementById('status')
+  v.src = 'file:///C:/Users/decca/Documents/Bandicam/bandicam%202026-06-09%2018-37-20-948.mp4'
+  v.addEventListener('loadedmetadata', () => {
+    status.textContent = `duration ${v.duration.toFixed(2)}s, seek ${t}s`
+    v.currentTime = Math.min(t, Math.max(0, v.duration - 0.1))
+  })
+  v.addEventListener('seeked', () => {
+    v.pause()
+    status.textContent = `ready ${v.currentTime.toFixed(2)}s`
+    document.body.dataset.ready = '1'
+  })
+</script>

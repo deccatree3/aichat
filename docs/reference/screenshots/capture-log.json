@@ -1,0 +1,18 @@
+[
+  { "num": "01", "phase": "guest", "file": "zeta_01-home-guest-entry-notice-modal.png", "url": "https://zeta-ai.io/ko", "situation": "첫 진입 시 자동으로 뜨는 게스트 안내/확인 모달. 홈 피드 위에 바텀시트로 '제타를 즐기기 전에 확인할 내용이 있어요' 노출, [확인하기] 버튼." },
+  { "num": "02", "phase": "guest", "file": "zeta_02-home-main-feed.png", "url": "https://zeta-ai.io/ko", "situation": "안내 모달 닫은 뒤 메인 홈. 추천 플롯(캐릭터) 카드 2열 피드. 상단 홈/랭킹 탭, 우상단 검색·알림 아이콘, 하단 탭바(홈/대화/제작/마이페이지)." },
+  { "num": "03", "phase": "guest", "file": "zeta_03-home-ranking-tab.png", "url": "https://zeta-ai.io/ko?tab=ranking", "situation": "홈 상단 '랭킹' 탭 선택. 인기 플롯 순위 목록." },
+  { "num": "04", "phase": "guest", "file": "zeta_04-search-empty.png", "url": "https://zeta-ai.io/ko/search", "situation": "검색 화면 진입(빈 상태). 검색 입력창 + 추천 키워드/해시태그." },
+  { "num": "05", "phase": "guest", "file": "zeta_05-search-results.png", "url": "https://zeta-ai.io/ko/search?keyword=로맨스", "situation": "검색창에 '로맨스' 입력 후 결과. 매칭 플롯 카드 그리드." },
+  { "num": "06", "phase": "guest", "file": "zeta_06-notification-guest.png", "url": "https://zeta-ai.io/ko/notification", "situation": "알림 화면, 비로그인(게스트) 상태에서의 표시." },
+  { "num": "07", "phase": "guest", "file": "zeta_07-plot-profile-detail.png", "url": "https://zeta-ai.io/ko/plots/b74b5b3a-d11d-43fb-a160-4a67d4ec91e5/profile", "situation": "플롯(캐릭터) 상세/프로필. 대표 이미지, 소개, 해시태그, 하단 '대화 시작' 버튼." },
+  { "num": "08", "phase": "guest", "file": "zeta_08-chat-room-guest-preview.png", "url": "https://zeta-ai.io/ko/rooms/{roomId}", "situation": "플롯 상세에서 '대화 시작' 클릭 → 게스트도 대화방 미리보기 진입(스토리 인트로 + 지문/대사 말풍선, 하단 '대화 입력하기' 입력창). 실제 메시지 전송 시 로그인 모달이 뜸." },
+  { "num": "09", "phase": "guest", "file": "zeta_09-login-page-full.png", "url": "https://zeta-ai.io/ko/login", "situation": "로그인 전체 페이지(/ko/login). 상단 히어로(대화 미리보기) + 하단 소셜 로그인 버튼: 카카오 / Google / Apple. zeta는 로그인 진입=방식선택이 한 화면(별도 모달 없음)." },
+  { "num": "10", "phase": "guest", "file": "zeta_10-mypage-guest.png", "url": "https://zeta-ai.io/ko/my-page", "situation": "마이페이지(비로그인 상태에서도 접근/렌더됨, 리디렉션 아님). 제타패스 구독 배너, 내 피스(0)/내역/충전, 자동충전, 회사정보·약관 푸터, 우상단 ☰(→/ko/more)." },
+  { "num": "11", "phase": "guest", "file": "zeta_11-more-settings-menu.png", "url": "https://zeta-ai.io/ko/more", "situation": "더보기/설정 메뉴(/ko/more). 공지사항·고객센터·알림설정·계정설정·차단(크리에이터/플롯/해시태그)·제타페이·로그아웃 항목." },
+  { "num": "12", "phase": "guest", "file": "zeta_12-login-required-bottomsheet-modal.png", "url": "https://zeta-ai.io/ko?nudge=DEFAULT&redirect={pathname:settings/account}", "situation": "[핵심] 로그인 필요한 메뉴(예: 계정설정) 접근 시 홈으로 리디렉션되며 뜨는 로그인 유도 바텀시트 모달. '로그인하고 다양한 AI 플롯을 자유롭게 즐겨보세요' + 카카오/Google/Apple. 주소창의 redirect 파라미터로 원래 목적지 보존." },
+  { "num": "13", "phase": "guest", "file": "zeta_13-piece-charge.png", "url": "https://zeta-ai.io/ko/piece/charge", "situation": "피스 충전(/ko/piece/charge). 퀵계좌이체 할인 배너 + 충전 상품 목록(200/500/1,000/2,000/3,000/5,000/10,000 피스, 원화 가격), 하단 이용안내." },
+  { "num": "14", "phase": "guest", "file": "zeta_14-piece-history.png", "url": "https://zeta-ai.io/ko/piece/history", "situation": "피스 사용/충전 내역(/ko/piece/history)." },
+  { "num": "15", "phase": "guest", "file": "zeta_15-announcements-list.png", "url": "https://zeta-ai.io/ko/announcements", "situation": "공지사항 목록(/ko/announcements)." },
+  { "num": "16", "phase": "guest", "file": "zeta_16-support-center.png", "url": "https://support.zeta-ai.io/zeta/ko", "situation": "고객센터. /ko/support 클릭 시 별도 지원 서브도메인(support.zeta-ai.io)으로 이동." }
+]

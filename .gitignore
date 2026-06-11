@@ -1,0 +1,23 @@
+node_modules/
+dist/
+.vite/
+.tmp/
+
+# Browser/user-local state. May contain cookies or session artifacts.
+.chrome-profile/
+**/.chrome-profile/
+.claude/
+chat_log/
+*.local.json
+
+# Local OS/editor noise
+.DS_Store
+Thumbs.db
+
+
+.env
+.env.local
+.env.*.local
+
+# Supabase local metadata. May contain project links.
+frontend/supabase/.temp/

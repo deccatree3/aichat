@@ -1,0 +1,15 @@
+{
+  "name": "aichat-zeta-prototype",
+  "private": true,
+  "version": "0.1.0",
+  "type": "commonjs",
+  "scripts": {
+    "capture:guest": "node tools/capture/collect_guest.js",
+    "capture:auth": "node tools/capture/collect_auth.js",
+    "capture:doc": "node tools/capture/gen_doc.js"
+  },
+  "dependencies": {
+    "playwright": "^1.60.0"
+  }
+}
+
