@@ -1,70 +1,50 @@
-# Next Session Prompt
+# 다음 세션 시작 프롬프트
 
-Continue work in `C:\codex\aichat`.
+`C:\codex\aichat`에서 이어서 작업하세요.
 
-Read first:
+먼저 읽을 파일:
+
+- `AGENTS.md`
 - `CONTEXT.md`
 - `HANDOFF.md`
-- latest `chat_log/*_digest.md`
-- `frontend/src/App.tsx`
-- `frontend/src/pages/CustomerCenterPage.tsx`
-- `frontend/src/index.css`
+- 최신 `chat_log/*_digest.md`
 
-Current state:
-- Vite React frontend under `frontend/`.
-- Supabase Auth is wired through `authService`.
-- Google login works.
-- Kakao configured for current prototype.
-- Apple setup deferred.
-- Notice management was implemented:
-  - public `/announcements` and detail pages query service data.
-  - admin routes exist under `/admin/notices`.
-  - admin access requires Supabase `admin_users(user_id)`.
-  - SQL file: `frontend/supabase/notices.sql`.
-- Customer center was expanded:
-  - `/customer-center`
-  - `/customer-center/search`
-  - `/customer-center/faqs`
-  - `/customer-center/faqs/:id`
-  - `/customer-center/contacts`
-  - `/customer-center/contacts/create`
-  - `/customer-center/contacts/:id`
-  - SQL file: `frontend/supabase/support.sql`.
-- Customer center PC layout was adjusted to match Zeta support screenshots:
-  - black header,
-  - cover hero image,
-  - centered search,
-  - category cards,
-  - popular FAQ,
-  - announcements,
-  - contact CTA,
-  - Katchers footer.
-- Katchers footer info is now:
-  - `(주)캐처스`
-  - 박은상
-  - `06626 서울 서초구 강남대로 341, 8층 831호`
-  - `1577-6037`
-  - `556-81-02489`
-  - `제 2022-서울서초-1505호`
-  - `admin@katchers.co.kr`
+현재 프로젝트는 Vite React 프로토타입이며 Supabase Auth/DB/Edge Function을 사용합니다. 최근 작업은 카카오 소셜 로그인, 앱 회원 생성, 탈퇴 처리, 카카오 연결 해제, 회원 ID 명칭 통일입니다.
 
-Verification baseline:
-- `npm run lint` passes.
-- `npm run build` passes.
-- Build emits only a chunk-size warning.
+중요한 현재 기준:
 
-Likely next tasks:
-- Continue screenshot-level visual tuning of `/customer-center`.
-- Apply Supabase SQL files if moving from fallback data to real DB content:
-  - `frontend/supabase/notices.sql`
-  - `frontend/supabase/support.sql`
-- Build admin management for FAQs/categories/contact replies.
-- Populate real FAQ/customer-center content.
-- Add app profiles/onboarding DB.
+- 우리 서비스 회원 ID는 `mid`.
+- Supabase Auth UID는 `uid`.
+- `app_users.mid`는 순번형 `bigint identity`.
+- `app_users.uid`는 현재 연결된 Supabase Auth UID.
+- `auth_identities.uid`는 primary key.
+- `auth_identities.id`는 제거됨.
+- `account_withdrawals.id`는 순번형 ID로 변경됨.
+- 재가입 제한은 현재 해제됨.
+- 추후 정책 검토: 벤치마킹 참고 재가입 유예기한 설정.
 
-User preferences:
-- Korean, concise.
-- Match provided screenshots closely.
-- Explain setup one step at a time.
-- Do not guess provider console or legal/business details.
-- Do not paste secrets.
+현재 추가된 Edge Functions:
+
+- `frontend/supabase/functions/ensure-app-user/index.ts`
+- `frontend/supabase/functions/withdraw-account/index.ts`
+- `frontend/supabase/functions/check-rejoin-block/index.ts`
+
+Supabase secrets:
+
+- `WITHDRAWAL_HASH_SECRET` 설정됨.
+- `KAKAO_ADMIN_KEY` 설정됨.
+
+다음 우선 작업:
+
+1. `notices.id`를 UUID에서 1, 2, 3 형식의 순번 ID로 변경.
+2. 원격 Supabase DB migration 적용.
+3. 공지 서비스 타입/라우팅에서 순번 ID가 문제 없는지 확인.
+4. `npm run lint`, `npm run build` 실행.
+5. 필요하면 변경분 커밋.
+
+주의:
+
+- 긴 답변에는 `AGENTS.md`의 답변 시작/끝 마커를 적용.
+- 파일 본문, raw stdout, diff를 채팅에 길게 붙이지 말 것.
+- 로컬 파일은 가능한 한 `file://` 링크로 보고.
+- 민감 정보는 채팅이나 파일에 쓰지 말 것.

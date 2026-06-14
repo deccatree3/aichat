@@ -1,103 +1,124 @@
-# Handoff
+# 핸드오프
 
-## Current State
+## 현재 상태
 
-The project in `C:\codex\aichat` is a working React/Vite prototype with Supabase Auth integration and newly added Supabase-backed service layers for notices and customer center content.
+`C:\codex\aichat`는 Vite React 프로토타입이며, Supabase Auth/DB/Edge Function을 사용합니다. 최근 작업의 중심은 카카오 소셜 로그인 후 회원 생성, 탈퇴, 카카오 연결 해제, 회원 ID 명칭 정리입니다.
 
-Latest confirmed checks:
-- `npm run lint` passed.
-- `npm run build` passed.
+## 최근 완료 작업
 
-## Most Recent Completed Work
+- Git 초기 스냅샷 커밋이 만들어졌습니다.
+  - 커밋 메시지: `Initial project snapshot`
+  - 커밋: `30ad4b6`
+- `AGENTS.md`를 정상 한글 지침으로 복구했습니다.
+- `chat_log/`는 gitignore 대상입니다.
+- Supabase Edge Function 3개가 추가되었습니다.
+  - `ensure-app-user`
+  - `withdraw-account`
+  - `check-rejoin-block`
+- Supabase secrets가 설정되었습니다.
+  - `WITHDRAWAL_HASH_SECRET`
+  - `KAKAO_ADMIN_KEY`
+  - 기존 Supabase URL/Anon/Service Role 계열 secret
+- 탈퇴 흐름이 구현되었습니다.
+  - 탈퇴 사유 입력.
+  - 서비스 기록 보존.
+  - 탈퇴 기록 저장.
+  - 회원 상태를 withdrawn으로 변경.
+  - 카카오 연결 해제 시도.
+- 재가입 제한은 임시로 해제했습니다.
+- 회원 ID 명칭을 정리했습니다.
+  - 우리 서비스 회원 ID: `mid`
+  - Supabase Auth UID: `uid`
+  - `app_users.mid`: 순번형 회원 ID.
+  - `app_users.uid`: 현재 연결된 Supabase Auth UID.
+- `auth_identities.id`는 삭제했고, `auth_identities.uid`가 primary key입니다.
+- `account_withdrawals.id`는 UUID에서 순번형 ID로 변경했습니다.
 
-- Implemented notice management from the previous plan:
-  - `notices` service layer with Supabase and static fallback.
-  - public `/announcements` and `/announcements/:id` now query service data.
-  - admin routes:
-    - `/admin/notices`
-    - `/admin/notices/new`
-    - `/admin/notices/:id/edit`
-  - admin guard checks `admin_users`.
-  - access failures show explicit login/admin-permission screens.
-  - edit form uses status select for draft/published/archived; separate archive button removed.
-  - SQL file added: `frontend/supabase/notices.sql`.
-- Guided user through Supabase setup:
-  - `user_id` means Supabase Auth `User UID`.
-  - `admin_users` table must be created by running SQL first.
-- Benchmarked `https://support.zeta-ai.io/zeta/ko`:
-  - confirmed it is a custom React/Vite SPA backed by Zeta-owned APIs.
-  - not an external CMS such as Zendesk/Intercom/Channel.io.
-- Implemented customer center:
-  - home,
-  - FAQ list/detail,
-  - search,
-  - contact list/create/detail,
-  - service layer and fallback content,
-  - support SQL schema/RLS.
-- Adjusted customer center responsive layout:
-  - support routes use `app-shell--support`,
-  - PC no longer constrained to 480px,
-  - screenshot-like PC layout with wide header/hero/content/footer.
-- Updated customer center footer to Katchers info:
-  - `(주)캐처스`
-  - 대표자/개인정보보호책임자 박은상
-  - 주소 `06626 서울 서초구 강남대로 341, 8층 831호`
-  - 전화 `1577-6037`
-  - 사업자등록번호 `556-81-02489`
-  - 통신판매업 신고번호 `제 2022-서울서초-1505호`
-  - 이메일 `admin@katchers.co.kr`
+## 중요한 파일
 
-## Important Files
-
-- `frontend/src/App.tsx`
-- `frontend/src/index.css`
-- `frontend/src/pages/CustomerCenterPage.tsx`
-- `frontend/src/pages/SupportFaqListPage.tsx`
-- `frontend/src/pages/SupportFaqDetailPage.tsx`
-- `frontend/src/pages/SupportSearchPage.tsx`
-- `frontend/src/pages/SupportContactListPage.tsx`
-- `frontend/src/pages/SupportContactCreatePage.tsx`
-- `frontend/src/pages/SupportContactDetailPage.tsx`
-- `frontend/src/support/supportService.ts`
-- `frontend/src/support/fallbackData.ts`
-- `frontend/supabase/support.sql`
+- `AGENTS.md`
+- `CONTEXT.md`
+- `HANDOFF.md`
+- `NEXT_SESSION.md`
+- `frontend/src/auth/authService.ts`
+- `frontend/src/auth/AuthContext.tsx`
+- `frontend/src/auth/types.ts`
+- `frontend/src/pages/AuthCallbackPage.tsx`
+- `frontend/src/pages/WithdrawalPage.tsx`
+- `frontend/src/db/profileService.ts`
+- `frontend/src/db/notificationService.ts`
+- `frontend/src/db/walletService.ts`
+- `frontend/src/db/blockService.ts`
 - `frontend/src/notices/noticeService.ts`
-- `frontend/src/pages/AdminNoticeGuard.tsx`
-- `frontend/src/pages/AdminNoticeListPage.tsx`
-- `frontend/src/pages/AdminNoticeFormPage.tsx`
+- `frontend/src/support/supportService.ts`
+- `frontend/supabase/001_core.sql`
 - `frontend/supabase/notices.sql`
+- `frontend/supabase/support.sql`
+- `frontend/supabase/member_id_uid_migration.sql`
+- `frontend/supabase/auth_identities_drop_id.sql`
+- `frontend/supabase/functions/ensure-app-user/index.ts`
+- `frontend/supabase/functions/withdraw-account/index.ts`
+- `frontend/supabase/functions/check-rejoin-block/index.ts`
 
-## Next Likely Tasks
+## 현재 Git 상태
 
-- If user wants real data:
-  - run `frontend/supabase/notices.sql` and `frontend/supabase/support.sql` in Supabase SQL Editor.
-  - insert admin Auth UID into `public.admin_users`.
-  - populate FAQ/support content.
-- If user continues visual tuning:
-  - compare `/customer-center` against provided PC/mobile screenshots.
-  - adjust spacing, hero crop, and footer alignment.
-- If user wants operations:
-  - add admin screens for FAQ/category management.
-  - add admin contact-reply workflow for 1:1 문의.
-- If user wants production readiness:
-  - add profiles/onboarding DB.
-  - add policies.
-  - add real account deletion backend.
-  - code-split the frontend to reduce bundle warning.
+작업트리는 깨끗하지 않습니다. 주요 변경은 회원 ID/탈퇴/Supabase 함수 관련 파일입니다.
 
-## Constraints
+새 파일:
 
-- Do not paste credentials or secrets into chat or docs.
-- Do not guess legal/business information; ask user or verify before changing legal footer/policy text.
-- Do not silently redirect admin failure to user home.
-- Keep Korean responses concise.
-- Use file links for local artifacts in final summaries.
+- `frontend/supabase/functions/`
+- `frontend/supabase/member_id_uid_migration.sql`
+- `frontend/supabase/auth_identities_drop_id.sql`
 
-## Dev Server
+수정 파일:
 
-Dev server may already be running on:
-- `http://127.0.0.1:5173`
+- `AGENTS.md`
+- `CONTEXT.md`
+- `HANDOFF.md`
+- `NEXT_SESSION.md`
+- `frontend/src/auth/*`
+- `frontend/src/db/*`
+- `frontend/src/notices/noticeService.ts`
+- `frontend/src/pages/AdminNoticeFormPage.tsx`
+- `frontend/src/pages/AdminNoticeGuard.tsx`
+- `frontend/src/pages/WithdrawalPage.tsx`
+- `frontend/src/support/supportService.ts`
+- `frontend/supabase/001_core.sql`
+- `frontend/supabase/notices.sql`
+- `frontend/supabase/support.sql`
 
-If needed:
-- Workdir: `C:\codex\aichat\frontend`
-- Command: `npm run dev -- --host 127.0.0.1 --port 5173`
+Git 명령 실행 시 `C:\Users\decca/.config/git/ignore` 권한 경고가 나올 수 있습니다. 현재 작업에는 치명적이지 않습니다.
+
+## 다음 우선 작업
+
+1. 사용자가 요청했던 `notices.id`를 UUID에서 1, 2, 3 형식의 순번 ID로 변경.
+2. 변경 후 `frontend/src/notices/noticeService.ts` 타입과 ID 문자열 변환 필요 여부 확인.
+3. Supabase 원격 DB에 migration 적용.
+4. `npm run lint`, `npm run build`로 검증.
+5. 사용자 요청 시 현재 변경분을 Git 커밋.
+
+## 보류/정책 결정
+
+- 재가입 유예기한 정책:
+  - 현재는 제한 없음.
+  - 추후 벤치마킹 후 없음/7일/30일/조건부 제한 중 결정.
+- 탈퇴 후 보존 데이터 범위:
+  - 현재 사용자 의사: 탈퇴해도 서비스 내 구매, 방문, 행동 기록은 남겨야 함.
+- Kakao에서 수집하는 정보:
+  - 현재 명시 범위는 `account_email`.
+  - provider user id는 원문 저장하지 않고 hash 저장.
+
+## 검증 기준
+
+최근 검증:
+
+- `frontend`에서 `npm run lint` 통과.
+- `frontend`에서 `npm run build` 통과.
+- Vite chunk-size 경고는 남아 있습니다.
+
+## 응답 규칙
+
+- 한국어로 답합니다.
+- 긴 답변에는 `AGENTS.md` 마커 규칙을 지킵니다.
+- 로컬 파일은 가능한 한 `file://` 링크로 보고합니다.
+- 긴 코드/로그/diff를 채팅에 붙이지 않습니다.
