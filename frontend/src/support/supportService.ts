@@ -23,7 +23,7 @@ type FaqRow = {
 
 type ContactRow = {
   id: string
-  user_id: string
+  mid: string
   category_id: string | null
   title: string
   body: string
@@ -36,7 +36,7 @@ type ContactRow = {
 type ReplyRow = {
   id: string
   contact_id: string
-  author_id: string | null
+  author_uid: string | null
   body: string
   is_staff: boolean
   created_at: string
@@ -68,7 +68,7 @@ function toFaq(row: FaqRow): Faq {
 function toContact(row: ContactRow): Contact {
   return {
     id: row.id,
-    userId: row.user_id,
+    userId: row.mid,
     categoryId: row.category_id,
     categoryName: row.support_categories?.name ?? null,
     title: row.title,
@@ -83,7 +83,7 @@ function toReply(row: ReplyRow): ContactReply {
   return {
     id: row.id,
     contactId: row.contact_id,
-    authorId: row.author_id,
+    authorId: row.author_uid,
     body: row.body,
     isStaff: row.is_staff,
     createdAt: row.created_at,
@@ -101,8 +101,8 @@ export const supportService = {
       .order('sort_order', { ascending: true })
 
     if (error) {
-      console.warn('Falling back to support categories:', error.message)
-      return fallbackCategories
+      console.warn('Failed to load support categories:', error.message)
+      return []
     }
     return (data as CategoryRow[]).map(toCategory)
   },
@@ -123,8 +123,8 @@ export const supportService = {
 
     const { data, error } = await query
     if (error) {
-      console.warn('Falling back to FAQs:', error.message)
-      return categoryId ? fallbackFaqs.filter((faq) => faq.categoryId === categoryId) : fallbackFaqs
+      console.warn('Failed to load FAQs:', error.message)
+      return []
     }
     return (data as unknown as FaqRow[]).map(toFaq)
   },
@@ -145,8 +145,8 @@ export const supportService = {
       .maybeSingle()
 
     if (error) {
-      console.warn('Falling back to FAQ:', error.message)
-      return fallbackFaqs.find((faq) => faq.id === id) ?? null
+      console.warn('Failed to load FAQ:', error.message)
+      return null
     }
     return data ? toFaq(data as unknown as FaqRow) : null
   },
@@ -170,10 +170,8 @@ export const supportService = {
       .order('sort_order', { ascending: true })
 
     if (error) {
-      console.warn('Falling back to FAQ search:', error.message)
-      return fallbackFaqs.filter((faq) =>
-        `${faq.title} ${faq.bodyMarkdown} ${faq.categoryName}`.toLowerCase().includes(normalized),
-      )
+      console.warn('Failed to search FAQs:', error.message)
+      return []
     }
     return (data as unknown as FaqRow[]).map(toFaq)
   },
@@ -183,13 +181,13 @@ export const supportService = {
 
     const { data, error } = await supabase
       .from('contacts')
-      .select('id,user_id,category_id,title,body,status,created_at,updated_at,support_categories(name)')
-      .eq('user_id', userId)
+      .select('id,mid,category_id,title,body,status,created_at,updated_at,support_categories(name)')
+      .eq('mid', userId)
       .order('updated_at', { ascending: false })
 
     if (error) {
-      console.warn('Falling back to contacts:', error.message)
-      return fallbackContacts(userId)
+      console.warn('Failed to load contacts:', error.message)
+      return []
     }
     return (data as unknown as ContactRow[]).map(toContact)
   },
@@ -199,9 +197,9 @@ export const supportService = {
 
     const { data: contactData, error: contactError } = await supabase
       .from('contacts')
-      .select('id,user_id,category_id,title,body,status,created_at,updated_at,support_categories(name)')
+      .select('id,mid,category_id,title,body,status,created_at,updated_at,support_categories(name)')
       .eq('id', id)
-      .eq('user_id', userId)
+      .eq('mid', userId)
       .maybeSingle()
 
     if (contactError) throw contactError
@@ -209,7 +207,7 @@ export const supportService = {
 
     const { data: replyData, error: replyError } = await supabase
       .from('contact_replies')
-      .select('id,contact_id,author_id,body,is_staff,created_at')
+      .select('id,contact_id,author_uid,body,is_staff,created_at')
       .eq('contact_id', id)
       .order('created_at', { ascending: true })
 
@@ -238,12 +236,12 @@ export const supportService = {
     const { data, error } = await supabase
       .from('contacts')
       .insert({
-        user_id: userId,
+        mid: userId,
         category_id: values.categoryId || null,
         title: values.title.trim(),
         body: values.body.trim(),
       })
-      .select('id,user_id,category_id,title,body,status,created_at,updated_at,support_categories(name)')
+      .select('id,mid,category_id,title,body,status,created_at,updated_at,support_categories(name)')
       .single()
 
     if (error) throw error

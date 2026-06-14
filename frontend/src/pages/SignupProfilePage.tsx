@@ -45,10 +45,8 @@ export default function SignupProfilePage() {
       void profileService.upsertProfile(user.id, {
         nickname: name,
         username: user.username || name,
-        email: user.email ?? null,
         birthdate,
         gender,
-        provider: user.provider,
         onboardingCompleted: true,
       })
     }
@@ -66,7 +64,7 @@ export default function SignupProfilePage() {
       {step === 'name' ? (
         <>
           <section className="signup-profile">
-            <h2>zeta에서는 무엇이든 될 수 있어요 🧚</h2>
+            <h2>aichat에서는 무엇이든 될 수 있어요 🧚</h2>
             <p>대화할 때 사용할 프로필을 만들어보세요<br />나중에도 수정할 수 있어요</p>
 
             <label>

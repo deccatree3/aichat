@@ -9,8 +9,8 @@ type NoticeRow = {
   status: NoticeStatus
   is_pinned: boolean
   published_at: string | null
-  created_by: string | null
-  updated_by: string | null
+  created_by_uid: string | null
+  updated_by_uid: string | null
   created_at: string
   updated_at: string
 }
@@ -23,8 +23,8 @@ function toNotice(row: NoticeRow): Notice {
     status: row.status,
     isPinned: row.is_pinned,
     publishedAt: row.published_at,
-    createdBy: row.created_by,
-    updatedBy: row.updated_by,
+    createdBy: row.created_by_uid,
+    updatedBy: row.updated_by_uid,
     createdAt: row.created_at,
     updatedAt: row.updated_at,
   }
@@ -61,7 +61,7 @@ function formatPayload(values: NoticeFormValues, userId: string) {
     status: values.status,
     is_pinned: values.isPinned,
     published_at: publishedAt,
-    updated_by: userId,
+    updated_by_uid: userId,
   }
 }
 
@@ -82,8 +82,8 @@ export const noticeService = {
       .order('published_at', { ascending: false })
 
     if (error) {
-      console.warn('Falling back to bundled notices:', error.message)
-      return fallbackAsNotices()
+      console.warn('Failed to load notices:', error.message)
+      return []
     }
 
     return (data as NoticeRow[]).map(toNotice)
@@ -102,8 +102,8 @@ export const noticeService = {
       .maybeSingle()
 
     if (error) {
-      console.warn('Falling back to bundled notice:', error.message)
-      return fallbackAsNotices().find((notice) => notice.id === id) ?? null
+      console.warn('Failed to load notice:', error.message)
+      return null
     }
 
     return data ? toNotice(data as NoticeRow) : null
@@ -114,8 +114,8 @@ export const noticeService = {
 
     const { data, error } = await supabase
       .from('admin_users')
-      .select('user_id')
-      .eq('user_id', userId)
+      .select('uid')
+      .eq('uid', userId)
       .maybeSingle()
 
     if (error) return false
@@ -149,7 +149,7 @@ export const noticeService = {
     const client = requireSupabase()
     const payload = {
       ...formatPayload(values, userId),
-      created_by: userId,
+      created_by_uid: userId,
     }
 
     const { data, error } = await client.from('notices').insert(payload).select('*').single()

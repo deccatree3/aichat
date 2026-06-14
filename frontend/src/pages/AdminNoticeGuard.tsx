@@ -27,7 +27,7 @@ export default function AdminNoticeGuard({ children }: { children: ReactNode }) 
     if (!authReady || !user) return
 
     noticeService
-      .isCurrentUserAdmin(user.id)
+      .isCurrentUserAdmin(user.uid)
       .then((allowed) => {
         if (mounted) setIsAdmin(allowed)
       })

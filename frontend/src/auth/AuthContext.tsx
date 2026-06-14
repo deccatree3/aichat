@@ -11,6 +11,7 @@ interface AuthContextValue {
   authError: string | null
   login: (provider: Provider) => Promise<void>
   logout: () => Promise<void>
+  withdrawAccount: (input: { reason: string; detail: string }) => Promise<void>
 }
 
 const AuthContext = createContext<AuthContextValue | undefined>(undefined)
@@ -65,8 +66,21 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     }
   }
 
+  const withdrawAccount = async (input: { reason: string; detail: string }) => {
+    setAuthError(null)
+    try {
+      await authService.withdrawAccount(input)
+      setUser(null)
+    } catch (error) {
+      const message = error instanceof Error ? error.message : '탈퇴 처리에 실패했습니다.'
+      setAuthError(message)
+      if (error instanceof Error) throw error
+      throw new Error(message, { cause: error })
+    }
+  }
+
   return (
-    <AuthContext.Provider value={{ user, authReady, authError, login, logout }}>
+    <AuthContext.Provider value={{ user, authReady, authError, login, logout, withdrawAccount }}>
       {children}
     </AuthContext.Provider>
   )
@@ -78,4 +92,3 @@ export function useAuth() {
   if (!ctx) throw new Error('useAuth must be used within AuthProvider')
   return ctx
 }
-

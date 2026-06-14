@@ -1,7 +1,7 @@
 create extension if not exists pgcrypto;
 
 create table if not exists public.admin_users (
-  user_id uuid primary key references auth.users(id) on delete cascade,
+  uid uuid primary key references auth.users(id) on delete cascade,
   created_at timestamptz not null default now()
 );
 
@@ -12,8 +12,8 @@ create table if not exists public.notices (
   status text not null default 'draft' check (status in ('draft', 'published', 'archived')),
   is_pinned boolean not null default false,
   published_at timestamptz,
-  created_by uuid references auth.users(id) on delete set null,
-  updated_by uuid references auth.users(id) on delete set null,
+  created_by_uid uuid references auth.users(id) on delete set null,
+  updated_by_uid uuid references auth.users(id) on delete set null,
   created_at timestamptz not null default now(),
   updated_at timestamptz not null default now()
 );
@@ -31,7 +31,7 @@ set search_path = public
 as $$
   select exists (
     select 1 from public.admin_users
-    where user_id = auth.uid()
+    where uid = auth.uid()
   );
 $$;
 
@@ -60,7 +60,7 @@ drop policy if exists "Admins can read admin users" on public.admin_users;
 create policy "Admins can read admin users"
 on public.admin_users
 for select
-using (user_id = auth.uid() or public.is_admin());
+using (uid = auth.uid() or public.is_admin());
 
 drop policy if exists "Public can read published notices" on public.notices;
 create policy "Public can read published notices"

@@ -9,8 +9,8 @@ export default function AuthCallbackPage() {
   useEffect(() => {
     async function complete() {
       try {
-        const user = await authService.completeCallback()
-        navigate(user?.provider === 'google' ? '/signup' : '/my-page', { replace: true })
+        await authService.completeCallback()
+        navigate('/signup', { replace: true })
       } catch (error) {
         setError(error instanceof Error ? error.message : '로그인 처리에 실패했습니다.')
       }

@@ -27,7 +27,7 @@ export default function LoginPage() {
   return (
     <main className="login-page">
       <section className="login-hero" style={{ backgroundImage: `linear-gradient(180deg, rgba(0,0,0,.1), rgba(0,0,0,.75)), url(${hero})` }}>
-        <div className="brand">zeta</div>
+        <div className="brand">aichat</div>
         <h1>다양한 AI 플롯으로<br />나만의 스토리를 만들어보세요</h1>
         <div className="story-preview" key={idx}>
           <div className="story-preview__name">{preview.name}</div>

@@ -2,6 +2,8 @@ export type Provider = 'kakao' | 'google' | 'apple'
 
 export interface User {
   id: string
+  mid: number
+  uid: string
   nickname: string
   username: string
   email?: string
@@ -12,6 +14,4 @@ export interface User {
   pieces: number
   followers: number
   following: number
-  zetaPass: boolean
-  zetaPassDaysRemaining?: number
 }

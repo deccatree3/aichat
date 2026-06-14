@@ -23,7 +23,7 @@ export const walletService = {
     const { data, error } = await supabase
       .from('wallets')
       .select('piece_balance')
-      .eq('user_id', userId)
+      .eq('mid', userId)
       .maybeSingle()
 
     if (error || !data) return fallbackBalance
@@ -36,7 +36,7 @@ export const walletService = {
     const { data, error } = await supabase
       .from('piece_ledger')
       .select('id,amount,reason,description,created_at')
-      .eq('user_id', userId)
+      .eq('mid', userId)
       .order('created_at', { ascending: false })
 
     if (error) return []

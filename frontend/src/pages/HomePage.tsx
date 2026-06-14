@@ -2,6 +2,8 @@ import { NavLink, useLocation, useNavigate } from 'react-router-dom'
 import { useEffect, useState } from 'react'
 import { useAuth } from '../auth/AuthContext'
 import BottomNav from '../components/BottomNav'
+import { contentService } from '../db/contentService'
+import type { PlotSummary } from '../db/contentService'
 
 interface Props {
   mode?: 'home' | 'ranking'
@@ -10,20 +12,18 @@ interface Props {
 }
 
 type RankingTab = 'trending' | 'best' | 'new'
-
-const cards = [
-  { name: '깊은 밤의 진', tag: '로맨스 · 학원물', desc: '어색한 사이에서 시작되는 비밀스러운 대화.' },
-  { name: '일진과 서현', tag: '드라마 · 긴장감', desc: '말을 빌려달라는 친구의 진짜 목적은 무엇일까?' },
-  { name: '가출소녀 지우', tag: '감정 · 서사', desc: '배고픔과 외로움 사이에서 이어지는 이야기.' },
-  { name: '주석현', tag: '집착 · CEO', desc: '차갑고 위험한 관계가 서서히 드러난다.' },
-]
-
-type PlotCard = (typeof cards)[number] & { rank?: number }
+type PlotCard = PlotSummary & { rank?: number }
 
 const rankingLabels: Record<RankingTab, string> = {
   trending: '트렌딩',
   best: '베스트',
   new: '신작',
+}
+
+function plotMeta(plot: PlotSummary) {
+  const tags = plot.tags.length ? plot.tags.map((tag) => `#${tag}`).join(' ') : plot.subtitle
+  const chats = plot.chatCount > 0 ? `대화 ${plot.chatCount.toLocaleString()}회` : ''
+  return [tags, chats].filter(Boolean).join(' · ')
 }
 
 export default function HomePage({ mode = 'home', title, onLoginRequired }: Props) {
@@ -33,9 +33,28 @@ export default function HomePage({ mode = 'home', title, onLoginRequired }: Prop
   const routeToast = (location.state as { toast?: string } | null)?.toast ?? ''
   const [rankingTab, setRankingTab] = useState<RankingTab>('trending')
   const [toast, setToast] = useState(routeToast)
-  const visibleCards: PlotCard[] = mode === 'ranking'
-    ? cards.map((card, index) => ({ ...card, rank: index + 1, tag: `${rankingLabels[rankingTab]} · ${card.tag}` }))
-    : cards
+  const [plots, setPlots] = useState<PlotSummary[]>([])
+  const [loading, setLoading] = useState(true)
+
+  useEffect(() => {
+    let mounted = true
+
+    const request = mode === 'ranking'
+      ? contentService.listRankingPlots(rankingTab)
+      : contentService.listHomePlots()
+
+    request
+      .then((items) => {
+        if (mounted) setPlots(items)
+      })
+      .finally(() => {
+        if (mounted) setLoading(false)
+      })
+
+    return () => {
+      mounted = false
+    }
+  }, [mode, rankingTab])
 
   useEffect(() => {
     if (!toast) return undefined
@@ -43,6 +62,10 @@ export default function HomePage({ mode = 'home', title, onLoginRequired }: Prop
     const timer = window.setTimeout(() => setToast(''), 1800)
     return () => window.clearTimeout(timer)
   }, [location.pathname, navigate, toast])
+
+  const visibleCards: PlotCard[] = mode === 'ranking'
+    ? plots.map((plot, index) => ({ ...plot, rank: index + 1 }))
+    : plots
 
   return (
     <main className="page with-nav">
@@ -89,16 +112,23 @@ export default function HomePage({ mode = 'home', title, onLoginRequired }: Prop
           ))}
         </div>
       )}
+      {loading && <p className="notice-state">불러오는 중입니다.</p>}
+      {!loading && visibleCards.length === 0 && (
+        <section className="empty-state">
+          <strong>등록된 플롯이 없습니다</strong>
+          <p>공개된 플롯이 생기면 이곳에 표시됩니다.</p>
+        </section>
+      )}
       <section className="plot-grid" aria-label="추천 플롯">
-        {visibleCards.map((card) => (
-          <article className="plot-card" key={card.name}>
+        {visibleCards.map((plot) => (
+          <article className="plot-card" key={plot.id}>
             <div className="plot-card__image" aria-hidden="true">
-              {card.rank ? <span className="rank-badge">{card.rank}</span> : null}
-              {card.name.slice(0, 1)}
+              {plot.rank ? <span className="rank-badge">{plot.rank}</span> : null}
+              {plot.thumbnailUrl ? <img src={plot.thumbnailUrl} alt="" /> : plot.title.slice(0, 1)}
             </div>
-            <strong>{card.name}</strong>
-            <span>{card.tag}</span>
-            <p>{card.desc}</p>
+            <strong>{plot.title}</strong>
+            <span>{plotMeta(plot)}</span>
+            <p>{plot.description ?? plot.subtitle ?? ''}</p>
             <button onClick={onLoginRequired}>대화 시작</button>
           </article>
         ))}

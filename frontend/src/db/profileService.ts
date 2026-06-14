@@ -7,12 +7,10 @@ export interface AppProfile {
   userId: string
   nickname: string
   username: string
-  email: string | null
   avatarUrl: string | null
   bio: string | null
   birthdate: string | null
   gender: string | null
-  provider: string | null
   onboardingCompleted: boolean
 }
 
@@ -20,6 +18,7 @@ export interface UserSettings {
   userId: string
   dialogueMode: DialogueMode
   marketingOptIn: boolean
+  chatBackgroundEnabled: boolean
 }
 
 export interface WalletSummary {
@@ -27,61 +26,100 @@ export interface WalletSummary {
   pieceBalance: number
 }
 
+export interface SocialIdentitySummary {
+  provider: string
+  email: string | null
+  providerName: string | null
+  providerAvatarUrl: string | null
+}
+
+export interface FollowSummary {
+  followers: number
+  following: number
+}
+
+export interface MembershipSummary {
+  active: boolean
+  planCode: string | null
+  daysRemaining: number | null
+}
+
+export interface AutoChargeSummary {
+  enabled: boolean
+  thresholdPieces: number
+}
+
 export interface AccountData {
   profile: AppProfile
   settings: UserSettings
   wallet: WalletSummary
+  identity: SocialIdentitySummary
+  follows: FollowSummary
+  membership: MembershipSummary
+  autoCharge: AutoChargeSummary
 }
 
 interface ProfileRow {
-  user_id: string
+  mid: string
   nickname: string
   username: string | null
-  email: string | null
   avatar_url: string | null
   bio: string | null
   birthdate: string | null
   gender: string | null
-  provider: string | null
   onboarding_completed: boolean
 }
 
 interface SettingsRow {
-  user_id: string
+  mid: string
   dialogue_mode: DialogueMode
   marketing_opt_in: boolean
+  chat_background_enabled?: boolean
 }
 
 interface WalletRow {
-  user_id: string
+  mid: string
   piece_balance: number
+}
+
+interface IdentityRow {
+  provider: string
+  email: string | null
+  provider_name: string | null
+  provider_avatar_url: string | null
+}
+
+interface MembershipRow {
+  plan_code: string
+  ends_at: string | null
+}
+
+interface AutoChargeRow {
+  enabled: boolean
+  threshold_pieces: number
 }
 
 export interface ProfilePatch {
   nickname?: string
   username?: string
-  email?: string | null
   bio?: string | null
   birthdate?: string | null
   gender?: string | null
-  provider?: string | null
   onboardingCompleted?: boolean
 }
 
 function fallbackProfile(user: User): AppProfile {
-  const nickname = user.nickname || 'SmoothLuck3136'
+  const nickname = user.nickname || 'aichat 회원'
   const username = user.username || nickname
 
   return {
     userId: user.id,
     nickname,
     username,
-    email: user.email ?? null,
     avatarUrl: null,
-    bio: user.bio ?? '자기소개 하기. 제타 하나',
+    bio: user.bio ?? '자기소개 하기. aichat 하나',
     birthdate: user.birthdate ?? null,
     gender: user.gender ?? null,
-    provider: user.provider ?? null,
     onboardingCompleted: false,
   }
 }
@@ -91,6 +129,7 @@ function fallbackSettings(userId: string): UserSettings {
     userId,
     dialogueMode: 'unlimited',
     marketingOptIn: false,
+    chatBackgroundEnabled: false,
   }
 }
 
@@ -105,45 +144,89 @@ function toProfile(row: ProfileRow, user: User): AppProfile {
   const fallback = fallbackProfile(user)
 
   return {
-    userId: row.user_id,
+    userId: row.mid,
     nickname: row.nickname || fallback.nickname,
     username: row.username || fallback.username,
-    email: row.email ?? fallback.email,
     avatarUrl: row.avatar_url,
     bio: row.bio ?? fallback.bio,
     birthdate: row.birthdate,
     gender: row.gender,
-    provider: row.provider ?? fallback.provider,
     onboardingCompleted: row.onboarding_completed,
   }
 }
 
 function toSettings(row: SettingsRow): UserSettings {
   return {
-    userId: row.user_id,
+    userId: row.mid,
     dialogueMode: row.dialogue_mode,
     marketingOptIn: row.marketing_opt_in,
+    chatBackgroundEnabled: Boolean(row.chat_background_enabled),
   }
 }
 
 function toWallet(row: WalletRow): WalletSummary {
   return {
-    userId: row.user_id,
+    userId: row.mid,
     pieceBalance: row.piece_balance,
+  }
+}
+
+function fallbackIdentity(user: User): SocialIdentitySummary {
+  return {
+    provider: user.provider,
+    email: user.email ?? null,
+    providerName: null,
+    providerAvatarUrl: null,
+  }
+}
+
+function toIdentity(row: IdentityRow): SocialIdentitySummary {
+  return {
+    provider: row.provider,
+    email: row.email,
+    providerName: row.provider_name,
+    providerAvatarUrl: row.provider_avatar_url,
+  }
+}
+
+function toMembership(row: MembershipRow | null): MembershipSummary {
+  if (!row) return { active: false, planCode: null, daysRemaining: null }
+  const daysRemaining = row.ends_at
+    ? Math.max(0, Math.ceil((new Date(row.ends_at).getTime() - Date.now()) / 86400000))
+    : null
+
+  return {
+    active: true,
+    planCode: row.plan_code,
+    daysRemaining,
+  }
+}
+
+function toAutoCharge(row: AutoChargeRow | null): AutoChargeSummary {
+  return {
+    enabled: Boolean(row?.enabled),
+    thresholdPieces: Number(row?.threshold_pieces ?? 0),
   }
 }
 
 function profilePayload(userId: string, values: ProfilePatch) {
   return {
-    user_id: userId,
+    mid: userId,
     nickname: values.nickname?.trim(),
     username: values.username?.trim(),
-    email: values.email ?? undefined,
     bio: values.bio ?? undefined,
     birthdate: values.birthdate ?? undefined,
     gender: values.gender ?? undefined,
-    provider: values.provider ?? undefined,
     onboarding_completed: values.onboardingCompleted,
+  }
+}
+
+function settingsPayload(userId: string, values: Partial<Omit<UserSettings, 'userId'>>) {
+  return {
+    mid: userId,
+    dialogue_mode: values.dialogueMode,
+    marketing_opt_in: values.marketingOptIn,
+    chat_background_enabled: values.chatBackgroundEnabled,
   }
 }
 
@@ -158,14 +241,47 @@ export const profileService = {
       profile: fallbackProfile(user),
       settings: fallbackSettings(user.id),
       wallet: fallbackWallet(user),
+      identity: fallbackIdentity(user),
+      follows: { followers: user.followers ?? 0, following: user.following ?? 0 },
+      membership: { active: false, planCode: null, daysRemaining: null },
+      autoCharge: { enabled: false, thresholdPieces: 0 },
     }
 
     if (!supabase) return fallback
 
-    const [profileResult, settingsResult, walletResult] = await Promise.all([
-      supabase.from('profiles').select('*').eq('user_id', user.id).maybeSingle(),
-      supabase.from('user_settings').select('*').eq('user_id', user.id).maybeSingle(),
-      supabase.from('wallets').select('*').eq('user_id', user.id).maybeSingle(),
+    const [
+      profileResult,
+      settingsResult,
+      walletResult,
+      identityResult,
+      followersResult,
+      followingResult,
+      membershipResult,
+      autoChargeResult,
+    ] = await Promise.all([
+      supabase.from('profiles').select('*').eq('mid', user.id).maybeSingle(),
+      supabase.from('user_settings').select('*').eq('mid', user.id).maybeSingle(),
+      supabase.from('wallets').select('*').eq('mid', user.id).maybeSingle(),
+      supabase
+        .from('auth_identities')
+        .select('provider,email,provider_name,provider_avatar_url')
+        .eq('mid', user.id)
+        .is('unlinked_at', null)
+        .order('linked_at', { ascending: false })
+        .limit(1)
+        .maybeSingle(),
+      supabase.from('follows').select('following_mid', { count: 'exact', head: true }).eq('following_mid', user.id),
+      supabase.from('follows').select('follower_mid', { count: 'exact', head: true }).eq('follower_mid', user.id),
+      supabase
+        .from('memberships')
+        .select('plan_code,ends_at')
+        .eq('mid', user.id)
+        .eq('status', 'active')
+        .or(`ends_at.is.null,ends_at.gt.${new Date().toISOString()}`)
+        .order('ends_at', { ascending: false, nullsFirst: false })
+        .limit(1)
+        .maybeSingle(),
+      supabase.from('auto_charge_settings').select('enabled,threshold_pieces').eq('mid', user.id).maybeSingle(),
     ])
 
     if (profileResult.error || settingsResult.error || walletResult.error) return fallback
@@ -174,23 +290,25 @@ export const profileService = {
       profile: profileResult.data ? toProfile(profileResult.data as ProfileRow, user) : fallback.profile,
       settings: settingsResult.data ? toSettings(settingsResult.data as SettingsRow) : fallback.settings,
       wallet: walletResult.data ? toWallet(walletResult.data as WalletRow) : fallback.wallet,
+      identity: identityResult.error || !identityResult.data ? fallback.identity : toIdentity(identityResult.data as IdentityRow),
+      follows: {
+        followers: followersResult.error ? fallback.follows.followers : followersResult.count ?? 0,
+        following: followingResult.error ? fallback.follows.following : followingResult.count ?? 0,
+      },
+      membership: membershipResult.error ? fallback.membership : toMembership((membershipResult.data as MembershipRow | null) ?? null),
+      autoCharge: autoChargeResult.error ? fallback.autoCharge : toAutoCharge((autoChargeResult.data as AutoChargeRow | null) ?? null),
     }
   },
 
   async upsertProfile(userId: string, values: ProfilePatch): Promise<void> {
     if (!supabase) return
-    const { error } = await supabase.from('profiles').upsert(profilePayload(userId, values), { onConflict: 'user_id' })
+    const { error } = await supabase.from('profiles').upsert(profilePayload(userId, values), { onConflict: 'mid' })
     if (error) throw error
   },
 
   async updateSettings(userId: string, values: Partial<Omit<UserSettings, 'userId'>>): Promise<void> {
     if (!supabase) return
-    const payload = {
-      user_id: userId,
-      dialogue_mode: values.dialogueMode,
-      marketing_opt_in: values.marketingOptIn,
-    }
-    const { error } = await supabase.from('user_settings').upsert(payload, { onConflict: 'user_id' })
+    const { error } = await supabase.from('user_settings').upsert(settingsPayload(userId, values), { onConflict: 'mid' })
     if (error) throw error
   },
 }

@@ -77,8 +77,8 @@ export default function AdminNoticeFormPage() {
     setSaving(true)
     try {
       const notice = id
-        ? await noticeService.update(id, values, user.id)
-        : await noticeService.create(values, user.id)
+        ? await noticeService.update(id, values, user.uid)
+        : await noticeService.create(values, user.uid)
       navigate(`/admin/notices/${notice.id}/edit`, { replace: true })
     } catch (err) {
       setError(err instanceof Error ? err.message : '저장에 실패했습니다.')

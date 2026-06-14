@@ -32,7 +32,7 @@ export const blockService = {
     const { data, error } = await supabase
       .from('user_blocks')
       .select('id,target_type,target_id,target_label')
-      .eq('user_id', userId)
+      .eq('mid', userId)
       .eq('target_type', targetType)
       .order('created_at', { ascending: false })
 
@@ -44,12 +44,12 @@ export const blockService = {
     if (!supabase) return
     const { error } = await supabase.from('user_blocks').upsert(
       {
-        user_id: userId,
+        mid: userId,
         target_type: targetType,
         target_id: targetId,
         target_label: targetLabel,
       },
-      { onConflict: 'user_id,target_type,target_id' },
+      { onConflict: 'mid,target_type,target_id' },
     )
 
     if (error) throw error

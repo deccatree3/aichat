@@ -1,7 +1,7 @@
 create extension if not exists pgcrypto;
 
 create table if not exists public.admin_users (
-  user_id uuid primary key references auth.users(id) on delete cascade,
+  uid uuid primary key references auth.users(id) on delete cascade,
   created_at timestamptz not null default now()
 );
 
@@ -14,7 +14,7 @@ set search_path = public
 as $$
   select exists (
     select 1 from public.admin_users
-    where user_id = auth.uid()
+    where uid = auth.uid()
   );
 $$;
 
@@ -36,15 +36,15 @@ create table if not exists public.faqs (
   status text not null default 'draft' check (status in ('draft', 'published', 'archived')),
   is_popular boolean not null default false,
   sort_order integer not null default 0,
-  created_by uuid references auth.users(id) on delete set null,
-  updated_by uuid references auth.users(id) on delete set null,
+  created_by_uid uuid references auth.users(id) on delete set null,
+  updated_by_uid uuid references auth.users(id) on delete set null,
   created_at timestamptz not null default now(),
   updated_at timestamptz not null default now()
 );
 
 create table if not exists public.contacts (
   id uuid primary key default gen_random_uuid(),
-  user_id uuid not null references auth.users(id) on delete cascade,
+  mid bigint not null references public.app_users(mid) on delete cascade,
   category_id text references public.support_categories(id) on update cascade,
   title text not null check (char_length(trim(title)) > 0),
   body text not null check (char_length(trim(body)) > 0),
@@ -56,7 +56,7 @@ create table if not exists public.contacts (
 create table if not exists public.contact_replies (
   id uuid primary key default gen_random_uuid(),
   contact_id uuid not null references public.contacts(id) on delete cascade,
-  author_id uuid references auth.users(id) on delete set null,
+  author_uid uuid references auth.users(id) on delete set null,
   body text not null check (char_length(trim(body)) > 0),
   is_staff boolean not null default false,
   created_at timestamptz not null default now()
@@ -65,7 +65,7 @@ create table if not exists public.contact_replies (
 create index if not exists support_categories_order_idx on public.support_categories (sort_order);
 create index if not exists faqs_public_idx on public.faqs (category_id, is_popular desc, sort_order)
   where status = 'published';
-create index if not exists contacts_user_idx on public.contacts (user_id, updated_at desc);
+create index if not exists contacts_mid_idx on public.contacts (mid, updated_at desc);
 create index if not exists contact_replies_contact_idx on public.contact_replies (contact_id, created_at);
 
 create or replace function public.touch_support_updated_at()
@@ -128,13 +128,13 @@ drop policy if exists "Users can read own contacts" on public.contacts;
 create policy "Users can read own contacts"
 on public.contacts
 for select
-using (user_id = auth.uid() or public.is_admin());
+using (mid = public.current_mid() or public.is_admin());
 
 drop policy if exists "Users can create own contacts" on public.contacts;
 create policy "Users can create own contacts"
 on public.contacts
 for insert
-with check (user_id = auth.uid());
+with check (mid = public.current_mid());
 
 drop policy if exists "Admins can update contacts" on public.contacts;
 create policy "Admins can update contacts"
@@ -152,7 +152,7 @@ using (
   or exists (
     select 1 from public.contacts
     where contacts.id = contact_replies.contact_id
-      and contacts.user_id = auth.uid()
+      and contacts.mid = public.current_mid()
   )
 );
 

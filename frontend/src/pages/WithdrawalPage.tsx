@@ -2,25 +2,37 @@ import { useRef, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useAuth } from '../auth/AuthContext'
 
-const reasons = ['계정 초기화', '개인 정보', '플롯/대화의 재미', '기타']
+const reasons = ['계정 초기화', '개인 정보', '플롯/대화의 문제', '기타']
 
 export default function WithdrawalPage() {
   const navigate = useNavigate()
-  const { logout } = useAuth()
+  const { withdrawAccount } = useAuth()
   const textareaRef = useRef<HTMLTextAreaElement>(null)
   const [open, setOpen] = useState(false)
   const [reason, setReason] = useState('')
   const [detail, setDetail] = useState('')
   const [firstConfirmOpen, setFirstConfirmOpen] = useState(false)
   const [finalConfirm, setFinalConfirm] = useState(false)
+  const [submitting, setSubmitting] = useState(false)
+  const [error, setError] = useState('')
   const canWithdraw = Boolean(reason && detail.trim())
+
   const toggleSelect = () => {
     textareaRef.current?.blur()
     setOpen((value) => !value)
   }
+
   const confirmWithdrawal = async () => {
-    await logout()
-    navigate('/', { replace: true, state: { toast: '동의하기' } })
+    if (submitting) return
+    setSubmitting(true)
+    setError('')
+    try {
+      await withdrawAccount({ reason, detail })
+      navigate('/', { replace: true, state: { toast: '탈퇴가 완료되었습니다.' } })
+    } catch (error) {
+      setError(error instanceof Error ? error.message : '탈퇴 처리에 실패했습니다.')
+      setSubmitting(false)
+    }
   }
 
   const pageClassName = [
@@ -43,15 +55,15 @@ export default function WithdrawalPage() {
         <section className="withdrawal-final">
           <div className="withdrawal-warning" aria-hidden="true">!</div>
           <h2>정말 탈퇴하시겠어요?</h2>
-          <p>탈퇴 이후에는 어떠한 수단으로도 복구가 불가능해요</p>
-          <button className="withdrawal-final-primary" onClick={confirmWithdrawal}>탈퇴하기</button>
-          <button className="withdrawal-final-secondary" onClick={() => setFinalConfirm(false)}>취소</button>
+          {error && <p role="alert">{error}</p>}
+          <button className="withdrawal-final-primary" onClick={confirmWithdrawal} disabled={submitting}>{submitting ? '처리 중' : '탈퇴하기'}</button>
+          <button className="withdrawal-final-secondary" onClick={() => setFinalConfirm(false)} disabled={submitting}>취소</button>
         </section>
       ) : (
         <>
           <section className="withdrawal-form">
             <h2>탈퇴하려는 이유를<br />알려주세요</h2>
-            <p>적어주시는 개선사항을 최대한 빠르게 반영할게요</p>
+            <p>적어주신 개선사항은 더 나은 서비스에 반영하겠습니다.</p>
 
             <div className={`withdrawal-select${open ? ' withdrawal-select--open' : ''}${reason ? ' withdrawal-select--selected' : ''}`}>
               <button onClick={toggleSelect}>
@@ -81,7 +93,6 @@ export default function WithdrawalPage() {
         <div className="account-overlay account-overlay--center" role="presentation">
           <section className="account-confirm" role="dialog" aria-modal="true" aria-labelledby="withdrawal-first-confirm-title">
             <h2 id="withdrawal-first-confirm-title">정말 탈퇴하시겠어요?</h2>
-            <p>탈퇴 이후에는 어떠한 수단으로도 복구가 불가능해요.</p>
             <div>
               <button onClick={() => setFirstConfirmOpen(false)}>취소</button>
               <button onClick={() => {

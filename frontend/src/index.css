@@ -91,6 +91,7 @@ a { color: inherit; text-decoration: none; }
 .plot-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; }
 .plot-card { background: var(--surface); border-radius: var(--radius); padding: 10px; min-width: 0; }
 .plot-card__image { height: 138px; border-radius: 6px; background: linear-gradient(135deg, #33343a, #7752dc 58%, #202024); display: grid; place-items: center; font-size: 44px; font-weight: 800; margin-bottom: 10px; position: relative; }
+.plot-card__image img { width: 100%; height: 100%; object-fit: cover; display: block; border-radius: 6px; }
 .rank-badge { position: absolute; top: 8px; left: 8px; min-width: 28px; height: 28px; border-radius: 6px; display: grid; place-items: center; background: rgba(0,0,0,.62); font-size: 15px; }
 .plot-card strong, .plot-card span, .plot-card p { display: block; }
 .plot-card strong { font-size: 15px; }
@@ -164,6 +165,7 @@ a { color: inherit; text-decoration: none; }
   border-radius: 50% 50% 0 0;
   background: #b5b7bd;
 }
+.avatar img { width: 100%; height: 100%; object-fit: cover; border-radius: 50%; display: block; position: relative; z-index: 1; }
 .mypage-profile__identity strong,
 .mypage-profile__identity span { display: block; }
 .mypage-profile__identity strong { font-size: 14px; font-weight: 900; }
@@ -2353,10 +2355,16 @@ select {
   letter-spacing: 0;
 }
 
-.support-desktop-header > span {
+.support-user-link {
   color: #fff;
   font-size: 14px;
   font-weight: 900;
+  text-decoration: none;
+  cursor: pointer;
+}
+
+.support-user-link:hover {
+  text-decoration: underline;
 }
 
 .support-mobile-back {
@@ -2589,7 +2597,7 @@ select {
     font-size: 22px;
   }
 
-  .support-desktop-header > span {
+  .support-user-link {
     display: none;
   }
 

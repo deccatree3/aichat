@@ -5,6 +5,7 @@ import { noticeService } from '../notices/noticeService'
 import type { Notice } from '../notices/types'
 import { supportService } from '../support/supportService'
 import type { Faq, SupportCategory } from '../support/types'
+import { profileService } from '../db/profileService'
 
 export default function CustomerCenterPage() {
   const navigate = useNavigate()
@@ -13,6 +14,7 @@ export default function CustomerCenterPage() {
   const [categories, setCategories] = useState<SupportCategory[]>([])
   const [popularFaqs, setPopularFaqs] = useState<Faq[]>([])
   const [notices, setNotices] = useState<Notice[]>([])
+  const [displayName, setDisplayName] = useState<string | null>(null)
 
   useEffect(() => {
     let mounted = true
@@ -33,6 +35,19 @@ export default function CustomerCenterPage() {
     }
   }, [])
 
+  useEffect(() => {
+    let mounted = true
+    if (!user) return undefined
+
+    profileService.getAccountData(user).then((data) => {
+      if (mounted) setDisplayName(data.profile.nickname)
+    })
+
+    return () => {
+      mounted = false
+    }
+  }, [user])
+
   const submitSearch = (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault()
     const trimmed = query.trim()
@@ -43,8 +58,8 @@ export default function CustomerCenterPage() {
     <main className="page support-page">
       <header className="support-desktop-header">
         <button onClick={() => navigate(-1)} aria-label="뒤로" className="support-mobile-back">‹</button>
-        <Link to="/customer-center" className="support-brand"><strong>zeta</strong> 고객센터</Link>
-        <span>{user?.nickname ?? '로그인'}</span>
+        <Link to="/customer-center" className="support-brand"><strong>aichat</strong> 고객센터</Link>
+        <Link to={user ? '/my-page' : '/login'} className="support-user-link">{user ? displayName ?? user.nickname : '로그인'}</Link>
       </header>
 
       <section className="support-hero support-hero--cover">

@@ -1,6 +1,7 @@
 import { useNavigate } from 'react-router-dom'
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { useAuth } from '../auth/AuthContext'
+import { profileService } from '../db/profileService'
 
 interface Props {
   onLoginRequired: () => void
@@ -66,13 +67,7 @@ const authSections: Section[] = [
   {
     title: '결제수단',
     items: [
-      { label: '제타페이 관리' },
-    ],
-  },
-  {
-    title: 'Nutty',
-    items: [
-      { label: 'Nutty 설정' },
+      { label: 'aichat 패스 관리' },
     ],
   },
   {
@@ -89,10 +84,27 @@ export default function MorePage({ onLoginRequired }: Props) {
   const sections = user ? authSections : guestSections
   const [toggles, setToggles] = useState({ chatBackground: false })
 
+  useEffect(() => {
+    let mounted = true
+    if (!user) return undefined
+
+    profileService.getAccountData(user).then((data) => {
+      if (mounted) setToggles({ chatBackground: data.settings.chatBackgroundEnabled })
+    })
+
+    return () => {
+      mounted = false
+    }
+  }, [user])
+
   const handleItem = (item: RowItem) => {
     if (item.toggleKey) {
       const key = item.toggleKey
-      setToggles((state) => ({ ...state, [key]: !state[key] }))
+      setToggles((state) => {
+        const nextValue = !state[key]
+        if (user) void profileService.updateSettings(user.id, { chatBackgroundEnabled: nextValue })
+        return { ...state, [key]: nextValue }
+      })
     } else if (item.to) navigate(item.to)
     else if (item.action === 'logout') void logout()
     else if (item.action === 'login') onLoginRequired()
@@ -101,7 +113,7 @@ export default function MorePage({ onLoginRequired }: Props) {
   return (
     <main className="page more-page">
       <header className="more-header">
-        <button className="more-header__back" onClick={() => navigate(-1)} aria-label="뒤로">‹</button>
+        <button className="more-header__back" onClick={() => navigate(-1)} aria-label="뒤로">←</button>
         <h1>더보기</h1>
         <span />
       </header>

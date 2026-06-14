@@ -19,7 +19,7 @@ export const notificationService = {
     const { data, error } = await supabase
       .from('notification_preferences')
       .select('category,key,enabled')
-      .eq('user_id', userId)
+      .eq('mid', userId)
       .eq('category', category)
 
     if (error) return defaults
@@ -34,7 +34,7 @@ export const notificationService = {
     if (!supabase) return
     const { error } = await supabase
       .from('notification_preferences')
-      .upsert({ user_id: userId, category, key, enabled }, { onConflict: 'user_id,category,key' })
+      .upsert({ mid: userId, category, key, enabled }, { onConflict: 'mid,category,key' })
 
     if (error) throw error
   },

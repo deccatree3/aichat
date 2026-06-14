@@ -1,4 +1,4 @@
-﻿import { useEffect, useState } from 'react'
+import { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { useAuth } from '../auth/AuthContext'
 import type { Provider } from '../auth/AuthContext'
@@ -41,7 +41,7 @@ export default function MyPage({ onLoginRequired }: Props) {
           <Link className="icon-btn" to="/more" aria-label="더보기">☰</Link>
         </header>
         <section className="mypage-login">
-          <div className="guest-hero__logo">zeta</div>
+          <div className="guest-hero__logo">aichat</div>
           <p>다양한 AI 플롯으로 나만의 스토리를 만들어보세요</p>
           <div className="mypage-login__actions sheet__actions">
             <div className="sheet__recommended">
@@ -57,17 +57,15 @@ export default function MyPage({ onLoginRequired }: Props) {
     )
   }
 
-  const nickname = accountData?.profile.nickname ?? user.nickname ?? 'SmoothLuck3136'
-  const username = accountData?.profile.username ?? user.username ?? nickname
-  const profile = {
-    nickname,
-    username,
-    bio: accountData?.profile.bio ?? user.bio ?? '자기소개 하기. 제타 하나',
-    pieces: accountData?.wallet.pieceBalance ?? user.pieces,
-    followers: user.followers,
-    following: user.following,
-    zetaPassDaysRemaining: user.zetaPassDaysRemaining ?? 27,
-  }
+  const nickname = accountData?.profile.nickname ?? user.nickname ?? 'aichat 회원'
+  const username = accountData?.profile.username ?? user.username ?? `member${user.mid}`
+  const avatarUrl = accountData?.profile.avatarUrl
+  const bio = accountData?.profile.bio ?? user.bio ?? '자기소개를 작성해보세요.'
+  const pieces = accountData?.wallet.pieceBalance ?? user.pieces
+  const followers = accountData?.follows.followers ?? 0
+  const following = accountData?.follows.following ?? 0
+  const membership = accountData?.membership
+  const autoCharge = accountData?.autoCharge
 
   return (
     <main className="page with-nav mypage">
@@ -78,17 +76,17 @@ export default function MyPage({ onLoginRequired }: Props) {
       <section className="mypage-profile">
         <div className="mypage-profile__head">
           <div className="avatar" aria-hidden="true">
-            <span />
+            {avatarUrl ? <img src={avatarUrl} alt="" /> : <span />}
           </div>
           <div className="mypage-profile__identity">
-            <strong>{profile.nickname}</strong>
-            <span>@{profile.username}</span>
+            <strong>{nickname}</strong>
+            <span>@{username}</span>
           </div>
         </div>
-        <p>{profile.bio}</p>
+        <p>{bio}</p>
         <div className="mypage-profile__stats">
-          <span><b>{profile.followers}</b> 팔로잉</span>
-          <span><b>{profile.following}</b> 팔로워</span>
+          <span><b>{following.toLocaleString()}</b> 팔로잉</span>
+          <span><b>{followers.toLocaleString()}</b> 팔로워</span>
         </div>
         <div className="mypage-profile__actions">
           <button>프로필 공유</button>
@@ -96,16 +94,20 @@ export default function MyPage({ onLoginRequired }: Props) {
         </div>
       </section>
 
-      <section className="pass-banner">
-        <strong><i aria-hidden="true">z</i> 제타패스 이용중</strong>
-        <Link to="/more">{profile.zetaPassDaysRemaining}일 남음 · 관리하기 ›</Link>
-      </section>
+      {membership?.active && (
+        <section className="pass-banner">
+          <strong><i aria-hidden="true">a</i> aichat 패스 이용중</strong>
+          <Link to="/more">
+            {membership.daysRemaining === null ? '관리하기 ›' : `${membership.daysRemaining}일 남음 · 관리하기 ›`}
+          </Link>
+        </section>
+      )}
 
       <section className="wallet">
         <div className="wallet__balance">
           <div>
             <span>내 피스</span>
-            <strong><i aria-hidden="true">z</i> {profile.pieces.toLocaleString()}</strong>
+            <strong><i aria-hidden="true">z</i> {pieces.toLocaleString()}</strong>
           </div>
           <div className="wallet__actions">
             <Link to="/piece/history">내역</Link>
@@ -115,14 +117,17 @@ export default function MyPage({ onLoginRequired }: Props) {
         <div className="wallet__auto">
           <span>자동충전</span>
           <div>
-            <strong><i aria-hidden="true">z</i> 더 편리한 피스충전!</strong>
-            <button onClick={onLoginRequired}>자동충전</button>
+            <strong>
+              <i aria-hidden="true">z</i>
+              {autoCharge?.enabled ? `${autoCharge.thresholdPieces.toLocaleString()}피스 이하 자동충전` : '자동충전 꺼짐'}
+            </strong>
+            <button onClick={onLoginRequired}>{autoCharge?.enabled ? '관리' : '설정'}</button>
           </div>
         </div>
       </section>
 
       <section className="mypage-company">
-        <h2>zeta</h2>
+        <h2>aichat</h2>
         <p>주식회사 캐처스</p>
         <p>
           서울 서초구 강남대로 341, 8층 831호<br />
