@@ -60,7 +60,7 @@ export default function MyPage({ onLoginRequired }: Props) {
   const nickname = accountData?.profile.nickname ?? user.nickname ?? 'aichat 회원'
   const username = accountData?.profile.username ?? user.username ?? `member${user.mid}`
   const avatarUrl = accountData?.profile.avatarUrl
-  const bio = accountData?.profile.bio ?? user.bio ?? '자기소개를 작성해보세요.'
+  const bio = accountData?.profile.bio ?? user.bio ?? '소개를 입력해보세요'
   const pieces = accountData?.wallet.pieceBalance ?? user.pieces
   const followers = accountData?.follows.followers ?? 0
   const following = accountData?.follows.following ?? 0

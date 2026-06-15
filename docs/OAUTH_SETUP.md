@@ -1,31 +1,29 @@
-# Social Login Setup
+﻿# Social Login Setup
 
-현재 프론트엔드는 Supabase Auth로 카카오, Google, Apple 소셜 로그인/회원가입을 받을 수 있게 연결되어 있습니다.
+?꾩옱 ?꾨줎?몄뿏?쒕뒗 Supabase Auth濡?移댁뭅?? Google, Apple ?뚯뀥 濡쒓렇???뚯썝媛?낆쓣 諛쏆쓣 ???덇쾶 ?곌껐?섏뼱 ?덉뒿?덈떎.
 
-환경변수가 없으면 로컬 목업 로그인으로 동작하므로, Supabase 설정 전에도 화면 개발은 계속할 수 있습니다.
+?섍꼍蹂?섍? ?놁쑝硫?濡쒖뺄 紐⑹뾽 濡쒓렇?몄쑝濡??숈옉?섎?濡? Supabase ?ㅼ젙 ?꾩뿉???붾㈃ 媛쒕컻? 怨꾩냽?????덉뒿?덈떎.
 
-## 구현 경계
+## 援ы쁽 寃쎄퀎
 
-Supabase 직접 의존은 아래 파일에만 모았습니다.
+Supabase 吏곸젒 ?섏〈? ?꾨옒 ?뚯씪?먮쭔 紐⑥븯?듬땲??
 
 - `frontend/src/auth/authService.ts`
 - `frontend/src/auth/supabase.ts`
 
-화면 컴포넌트는 `useAuth()`만 사용합니다. 나중에 Cognito, Auth0, 자체 OAuth 백엔드로 바꿀 때는 `authService`를 교체하는 방향으로 이전합니다.
+?붾㈃ 而댄룷?뚰듃??`useAuth()`留??ъ슜?⑸땲?? ?섏쨷??Cognito, Auth0, ?먯껜 OAuth 諛깆뿏?쒕줈 諛붽? ?뚮뒗 `authService`瑜?援먯껜?섎뒗 諛⑺뼢?쇰줈 ?댁쟾?⑸땲??
 
-## 지금 해야 할 일
+## 吏湲??댁빞 ????
+1. Supabase ?꾨줈?앺듃瑜??앹꽦?⑸땲??
+2. Supabase Project URL怨?anon public key瑜?蹂듭궗?⑸땲??
+3. `frontend/.env.example`??李멸퀬??`frontend/.env.local`??留뚮벊?덈떎.
+4. Supabase Redirect URL??`http://127.0.0.1:5173/auth/callback`??異붽??⑸땲??
+5. Kakao, Google, Apple 媛쒕컻??肄섏넄?먯꽌 OAuth ?깆쓣 留뚮벊?덈떎.
+6. 媛?provider??client id/secret/key瑜?Supabase Auth Provider ?ㅼ젙???낅젰?⑸땲??
+7. Vite dev server瑜??ъ떆?묓빀?덈떎.
+8. `/login`怨?`/my-page`?먯꽌 ?뚯뀥 踰꾪듉???뚯뒪?명빀?덈떎.
 
-1. Supabase 프로젝트를 생성합니다.
-2. Supabase Project URL과 anon public key를 복사합니다.
-3. `frontend/.env.example`을 참고해 `frontend/.env.local`을 만듭니다.
-4. Supabase Redirect URL에 `http://127.0.0.1:5173/auth/callback`을 추가합니다.
-5. Kakao, Google, Apple 개발자 콘솔에서 OAuth 앱을 만듭니다.
-6. 각 provider의 client id/secret/key를 Supabase Auth Provider 설정에 입력합니다.
-7. Vite dev server를 재시작합니다.
-8. `/login`과 `/my-page`에서 소셜 버튼을 테스트합니다.
-
-## 1. Supabase 환경변수
-
+## 1. Supabase ?섍꼍蹂??
 `frontend/.env.local`:
 
 ```env
@@ -33,7 +31,7 @@ VITE_SUPABASE_URL=https://your-project-ref.supabase.co
 VITE_SUPABASE_ANON_KEY=your-supabase-anon-key
 ```
 
-변경 후 서버 재시작:
+蹂寃????쒕쾭 ?ъ떆??
 
 ```powershell
 cd frontend
@@ -47,54 +45,51 @@ Supabase Dashboard > Authentication > URL Configuration:
 - Site URL: `http://127.0.0.1:5173`
 - Additional Redirect URLs:
   - `http://127.0.0.1:5173/auth/callback`
-  - 운영 도메인 콜백 URL, 예: `https://your-domain.com/auth/callback`
+  - ?댁쁺 ?꾨찓??肄쒕갚 URL, ?? `https://your-domain.com/auth/callback`
 
-프론트 앱은 OAuth 완료 후 `/auth/callback`에서 세션을 확정하고 `/my-page`로 이동합니다.
+?꾨줎???깆? OAuth ?꾨즺 ??`/auth/callback`?먯꽌 ?몄뀡???뺤젙?섍퀬 `/my-page`濡??대룞?⑸땲??
 
-## 3. Kakao 설정
+## 3. Kakao ?ㅼ젙
 
-Kakao Developers에서:
+Kakao Developers?먯꽌:
 
-- 애플리케이션 생성
-- 카카오 로그인 활성화
-- Redirect URI 추가: 보통 `https://your-project-ref.supabase.co/auth/v1/callback`
-- 동의항목에서 닉네임, 프로필 이미지, 이메일 등 필요한 항목 설정
-- Supabase가 요구하는 REST API key/client secret 값을 복사
-- Supabase Dashboard > Authentication > Providers > Kakao에 입력
+- ?좏뵆由ъ??댁뀡 ?앹꽦
+- 移댁뭅??濡쒓렇???쒖꽦??- Redirect URI 異붽?: 蹂댄넻 `https://your-project-ref.supabase.co/auth/v1/callback`
+- ?숈쓽??ぉ?먯꽌 ?됰꽕?? ?꾨줈???대?吏, ?대찓?????꾩슂????ぉ ?ㅼ젙
+- Supabase媛 ?붽뎄?섎뒗 REST API key/client secret 媛믪쓣 蹂듭궗
+- Supabase Dashboard > Authentication > Providers > Kakao???낅젰
 
-## 4. Google 설정
+## 4. Google ?ㅼ젙
 
-Google Cloud Console에서:
+Google Cloud Console?먯꽌:
 
-- OAuth consent screen 구성
-- OAuth 2.0 Client ID 생성, 유형은 Web application
+- OAuth consent screen 援ъ꽦
+- OAuth 2.0 Client ID ?앹꽦, ?좏삎? Web application
 - Authorized JavaScript origins: `http://127.0.0.1:5173`
-- Authorized redirect URIs: 보통 `https://your-project-ref.supabase.co/auth/v1/callback`
-- Client ID와 Client Secret 복사
-- Supabase Dashboard > Authentication > Providers > Google에 입력
+- Authorized redirect URIs: 蹂댄넻 `https://your-project-ref.supabase.co/auth/v1/callback`
+- Client ID? Client Secret 蹂듭궗
+- Supabase Dashboard > Authentication > Providers > Google???낅젰
 
-## 5. Apple 설정
+## 5. Apple ?ㅼ젙
 
-Apple은 준비 항목이 가장 많습니다.
+Apple? 以鍮???ぉ??媛??留롮뒿?덈떎.
 
-- Apple Developer Program 계정 필요
-- App ID 또는 Services ID에서 Sign in with Apple 활성화
-- Web login용 Services ID 생성
-- Supabase callback URL 등록
-- Sign in with Apple private key 생성
-- Team ID, Key ID, Services ID, private key를 Supabase에 입력
+- Apple Developer Program 怨꾩젙 ?꾩슂
+- App ID ?먮뒗 Services ID?먯꽌 Sign in with Apple ?쒖꽦??- Web login??Services ID ?앹꽦
+- Supabase callback URL ?깅줉
+- Sign in with Apple private key ?앹꽦
+- Team ID, Key ID, Services ID, private key瑜?Supabase???낅젰
 
-## 6. 현재 앱 동작
+## 6. ?꾩옱 ???숈옉
 
-- UI는 `useAuth().login(provider)`를 호출합니다.
-- `authService.login(provider)`가 Supabase `signInWithOAuth`를 호출합니다.
-- 처음 로그인한 OAuth 사용자는 Supabase Auth에 자동 회원가입됩니다.
-- 세션은 Supabase 클라이언트가 브라우저 저장소에 유지합니다.
-- `더보기 > 로그아웃`은 Supabase `signOut`을 호출합니다.
+- UI??`useAuth().login(provider)`瑜??몄텧?⑸땲??
+- `authService.login(provider)`媛 Supabase `signInWithOAuth`瑜??몄텧?⑸땲??
+- 泥섏쓬 濡쒓렇?명븳 OAuth ?ъ슜?먮뒗 Supabase Auth???먮룞 ?뚯썝媛?낅맗?덈떎.
+- ?몄뀡? Supabase ?대씪?댁뼵?멸? 釉뚮씪?곗? ??μ냼???좎??⑸땲??
+- `?붾낫湲?> 濡쒓렇?꾩썐`? Supabase `signOut`???몄텧?⑸땲??
 
-## 7. 나중에 업그레이드할 때
-
-Supabase에서 자체 백엔드 OAuth로 이전할 때 목표 인터페이스:
+## 7. ?섏쨷???낃렇?덉씠?쒗븷 ??
+Supabase?먯꽌 ?먯껜 諛깆뿏??OAuth濡??댁쟾????紐⑺몴 ?명꽣?섏씠??
 
 - `authService.getCurrentUser()`
 - `authService.login(provider)`
@@ -102,14 +97,12 @@ Supabase에서 자체 백엔드 OAuth로 이전할 때 목표 인터페이스:
 - `authService.logout()`
 - `authService.onAuthStateChange(callback)`
 
-이 함수들의 내부 구현만 바꾸면 화면 코드는 대부분 그대로 둡니다.
+???⑥닔?ㅼ쓽 ?대? 援ы쁽留?諛붽씀硫??붾㈃ 肄붾뱶???遺遺?洹몃?濡??〓땲??
 
-## 8. 운영 전 체크리스트
-
-- 운영 도메인을 Supabase URL Configuration에 추가
-- 운영 도메인을 Kakao/Google/Apple 개발자 콘솔에도 추가
-- 개인정보처리방침, 이용약관 URL 준비
-- 로그인 후 내부 `profiles` 테이블 생성 여부 결정
-- 결제/피스/채팅/LLM 호출은 프론트 직접 처리 금지, 백엔드 API 뒤로 이동
-- 사용자 ID는 Supabase `auth.users.id`를 내부 사용자 테이블과 연결해 향후 이전 가능하게 설계
+## 8. ?댁쁺 ??泥댄겕由ъ뒪??
+- ?댁쁺 ?꾨찓?몄쓣 Supabase URL Configuration??異붽?
+- ?댁쁺 ?꾨찓?몄쓣 Kakao/Google/Apple 媛쒕컻??肄섏넄?먮룄 異붽?
+- 媛쒖씤?뺣낫泥섎━諛⑹묠, ?댁슜?쎄? URL 以鍮?- 濡쒓렇?????대? `social_profiles` ?뚯씠釉??앹꽦 ?щ? 寃곗젙
+- 寃곗젣/?쇱뒪/梨꾪똿/LLM ?몄텧? ?꾨줎??吏곸젒 泥섎━ 湲덉?, 諛깆뿏??API ?ㅻ줈 ?대룞
+- ?ъ슜??ID??Supabase `auth.users.id`瑜??대? ?ъ슜???뚯씠釉붽낵 ?곌껐???ν썑 ?댁쟾 媛?ν븯寃??ㅺ퀎
 

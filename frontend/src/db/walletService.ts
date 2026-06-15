@@ -26,7 +26,8 @@ export const walletService = {
       .eq('mid', userId)
       .maybeSingle()
 
-    if (error || !data) return fallbackBalance
+    if (error) return fallbackBalance
+    if (!data) return 0
     return Number((data as { piece_balance: number }).piece_balance)
   },
 

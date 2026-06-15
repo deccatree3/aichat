@@ -17,7 +17,7 @@ function makeMockUser(provider: Provider): User {
     birthdate: '1983.06.24',
     gender: '남성',
     provider,
-    pieces: 170,
+    pieces: 0,
     followers: 0,
     following: 0,
   }
@@ -60,11 +60,11 @@ async function userFromSupabase(authUser: SupabaseUser): Promise<User> {
     nickname: 'aichat 회원',
     username: `member${identity.mid || ''}`,
     email: authUser.email,
-    bio: String(metadata.bio ?? '자기소개를 작성해보세요.'),
+    bio: String(metadata.bio ?? '소개를 입력해보세요'),
     birthdate: String(metadata.birthdate ?? ''),
     gender: String(metadata.gender ?? ''),
     provider,
-    pieces: Number(metadata.pieces ?? 170),
+    pieces: Number(metadata.pieces ?? 0),
     followers: 0,
     following: 0,
   }

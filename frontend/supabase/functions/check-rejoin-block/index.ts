@@ -1,4 +1,4 @@
-import { createClient } from 'https://esm.sh/@supabase/supabase-js@2'
+﻿import { createClient } from 'https://esm.sh/@supabase/supabase-js@2'
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -116,7 +116,7 @@ Deno.serve(async (req) => {
         .update({ status: 'active', withdrawn_at: null })
         .eq('mid', mid)
       await adminClient
-        .from('profiles')
+        .from('social_profiles')
         .update({ account_status: 'active', withdrawn_at: null })
         .eq('mid', mid)
       return json({ blocked: false })
@@ -124,6 +124,6 @@ Deno.serve(async (req) => {
 
     return json({ blocked: true, blockedUntil: data.rejoin_block_until })
   } catch (error) {
-    return json({ error: error instanceof Error ? error.message : '재가입 제한 확인에 실패했습니다.' }, 500)
+    return json({ error: error instanceof Error ? error.message : '?ш????쒗븳 ?뺤씤???ㅽ뙣?덉뒿?덈떎.' }, 500)
   }
 })

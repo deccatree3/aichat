@@ -176,7 +176,7 @@ Deno.serve(async (req) => {
     if (appUserError) throw appUserError
 
     const { error: profileError } = await adminClient
-      .from('profiles')
+      .from('social_profiles')
       .update({
         account_status: 'withdrawn',
         withdrawn_at: now,

@@ -164,6 +164,11 @@ Deno.serve(async (req) => {
     }, { onConflict: 'mid,provider' })
     if (identityError) throw identityError
 
+    const { error: walletError } = await adminClient
+      .from('wallets')
+      .upsert({ mid, piece_balance: 0 }, { onConflict: 'mid', ignoreDuplicates: true })
+    if (walletError) throw walletError
+
     return json({ mid, uid: user.id })
   } catch (error) {
     return json({ error: error instanceof Error ? error.message : '회원 식별자 생성에 실패했습니다.' }, 500)

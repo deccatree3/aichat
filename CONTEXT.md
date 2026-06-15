@@ -1,95 +1,94 @@
-# 프로젝트 컨텍스트
+﻿# ?꾨줈?앺듃 而⑦뀓?ㅽ듃
 
-## 프로젝트
+## ?꾨줈?앺듃
 
-`C:\codex\aichat`는 Zeta 계열 AI 채팅 서비스 UI를 참고해 만든 프로토타입입니다. 현재는 `frontend/`의 Vite + React + TypeScript 앱과 Supabase Auth/DB/Edge Function을 연결하는 구조입니다.
+`C:\codex\aichat`??Zeta 怨꾩뿴 AI 梨꾪똿 ?쒕퉬??UI瑜?李멸퀬??留뚮뱺 ?꾨줈?좏??낆엯?덈떎. ?꾩옱??`frontend/`??Vite + React + TypeScript ?깃낵 Supabase Auth/DB/Edge Function???곌껐?섎뒗 援ъ“?낅땲??
 
-## 주요 구조
+## 二쇱슂 援ъ“
 
-- `frontend/`: Vite React 앱.
-- `frontend/src/auth/`: Supabase Auth 래퍼와 로그인/탈퇴 흐름.
-- `frontend/src/db/`: 프로필, 알림, 지갑, 차단 등 앱 DB 서비스.
-- `frontend/src/notices/`: 공지 서비스.
-- `frontend/src/support/`: 고객센터 서비스.
-- `frontend/supabase/`: Supabase SQL과 Edge Function.
-- `chat_log/`: 컨저 로그, digest, raw trace manifest.
+- `frontend/`: Vite React ??
+- `frontend/src/auth/`: Supabase Auth ?섑띁? 濡쒓렇???덊눜 ?먮쫫.
+- `frontend/src/db/`: ?꾨줈?? ?뚮┝, 吏媛? 李⑤떒 ????DB ?쒕퉬??
+- `frontend/src/notices/`: 怨듭? ?쒕퉬??
+- `frontend/src/support/`: 怨좉컼?쇳꽣 ?쒕퉬??
+- `frontend/supabase/`: Supabase SQL怨?Edge Function.
+- `chat_log/`: 而⑥? 濡쒓렇, digest, raw trace manifest.
 
-## 현재 구현 상태
+## ?꾩옱 援ы쁽 ?곹깭
 
-- 홈/랭킹/마이페이지/더보기/설정/고객센터/공지/관리자 공지 화면이 존재합니다.
-- Supabase Auth 기반 소셜 로그인이 연결되어 있습니다.
-- Google 로그인은 사용자가 동작을 확인했습니다.
-- Kakao 로그인은 `account_email` 동의 범위를 사용합니다.
-- Apple 로그인 코드는 남아 있으나 설정은 보류입니다.
-- 고객센터는 Zeta 고객센터를 벤치마킹한 자체 React/Supabase 구조입니다.
-- 공지와 고객센터는 Supabase 서비스 레이어와 fallback 데이터를 함께 사용합니다.
-- 개발 서버는 보통 `http://127.0.0.1:5173/`에서 실행합니다.
+- ????궧/留덉씠?섏씠吏/?붾낫湲??ㅼ젙/怨좉컼?쇳꽣/怨듭?/愿由ъ옄 怨듭? ?붾㈃??議댁옱?⑸땲??
+- Supabase Auth 湲곕컲 ?뚯뀥 濡쒓렇?몄씠 ?곌껐?섏뼱 ?덉뒿?덈떎.
+- Google 濡쒓렇?몄? ?ъ슜?먭? ?숈옉???뺤씤?덉뒿?덈떎.
+- Kakao 濡쒓렇?몄? `account_email` ?숈쓽 踰붿쐞瑜??ъ슜?⑸땲??
+- Apple 濡쒓렇??肄붾뱶???⑥븘 ?덉쑝???ㅼ젙? 蹂대쪟?낅땲??
+- 怨좉컼?쇳꽣??Zeta 怨좉컼?쇳꽣瑜?踰ㅼ튂留덊궧???먯껜 React/Supabase 援ъ“?낅땲??
+- 怨듭?? 怨좉컼?쇳꽣??Supabase ?쒕퉬???덉씠?댁? fallback ?곗씠?곕? ?④퍡 ?ъ슜?⑸땲??
+- 媛쒕컻 ?쒕쾭??蹂댄넻 `http://127.0.0.1:5173/`?먯꽌 ?ㅽ뻾?⑸땲??
 
-## 회원/인증 ID 기준
+## ?뚯썝/?몄쬆 ID 湲곗?
 
-- 우리 서비스 회원 고유 ID는 `mid`입니다.
-- `app_users.mid`는 `bigint identity` 형식의 순번 ID입니다.
-- Supabase Auth 사용자 ID는 `uid`입니다.
-- `app_users.uid`는 현재 연결된 Supabase Auth UID입니다.
-- `auth_identities.uid`는 Supabase Auth UID이며, 현재 `auth_identities`의 primary key입니다.
-- `auth_identities.id` 컬럼은 제거했습니다.
-- 앱 사용자 소유 데이터는 가능한 한 `mid` 컬럼을 사용하도록 정리했습니다.
-- 관리자/인증 주체 컬럼은 `uid`, `created_by_uid`, `updated_by_uid`, `author_uid`처럼 Supabase Auth UID 의미가 드러나게 정리했습니다.
+- ?곕━ ?쒕퉬???뚯썝 怨좎쑀 ID??`mid`?낅땲??
+- `app_users.mid`??`bigint identity` ?뺤떇???쒕쾲 ID?낅땲??
+- Supabase Auth ?ъ슜??ID??`uid`?낅땲??
+- `app_users.uid`???꾩옱 ?곌껐??Supabase Auth UID?낅땲??
+- `auth_identities.uid`??Supabase Auth UID?대ŉ, ?꾩옱 `auth_identities`??primary key?낅땲??
+- `auth_identities.id` 而щ읆? ?쒓굅?덉뒿?덈떎.
+- ???ъ슜???뚯쑀 ?곗씠?곕뒗 媛?ν븳 ??`mid` 而щ읆???ъ슜?섎룄濡??뺣━?덉뒿?덈떎.
+- 愿由ъ옄/?몄쬆 二쇱껜 而щ읆? `uid`, `created_by_uid`, `updated_by_uid`, `author_uid`泥섎읆 Supabase Auth UID ?섎?媛 ?쒕윭?섍쾶 ?뺣━?덉뒿?덈떎.
 
-## 탈퇴/카카오 연결 해제
+## ?덊눜/移댁뭅???곌껐 ?댁젣
 
-- 탈퇴 UI는 `/withdrawal`에 있습니다.
-- 탈퇴 사유와 상세 사유를 입력받습니다.
-- 탈퇴 요청은 Supabase Edge Function `withdraw-account`로 보냅니다.
-- 탈퇴 시 현재 의도는 다음과 같습니다.
-  - 서비스 이용 기록은 삭제하지 않고 보존합니다.
-  - `account_withdrawals`에 탈퇴 기록을 남깁니다.
-  - `app_users.status`와 `profiles.account_status`를 `withdrawn`으로 바꿉니다.
-  - `auth_identities.unlinked_at`을 기록합니다.
-  - Kakao 계정이면 Kakao Admin Key로 카카오 연결 해제를 시도합니다.
-- `KAKAO_ADMIN_KEY`는 Supabase secret으로 설정되었습니다.
-- `WITHDRAWAL_HASH_SECRET`도 Supabase secret으로 설정되었습니다.
-- 재가입 제한은 현재 해제되어 있습니다.
-- 추후 검토 항목: 벤치마킹을 참고해 재가입 유예기한 없음/7일/30일/조건부 제한 중 정책 결정.
+- ?덊눜 UI??`/withdrawal`???덉뒿?덈떎.
+- ?덊눜 ?ъ쑀? ?곸꽭 ?ъ쑀瑜??낅젰諛쏆뒿?덈떎.
+- ?덊눜 ?붿껌? Supabase Edge Function `withdraw-account`濡?蹂대깄?덈떎.
+- ?덊눜 ???꾩옱 ?섎룄???ㅼ쓬怨?媛숈뒿?덈떎.
+  - ?쒕퉬???댁슜 湲곕줉? ??젣?섏? ?딄퀬 蹂댁〈?⑸땲??
+  - `account_withdrawals`???덊눜 湲곕줉???④퉩?덈떎.
+  - `app_users.status`? `social_profiles.account_status`瑜?`withdrawn`?쇰줈 諛붽퓠?덈떎.
+  - `auth_identities.unlinked_at`??湲곕줉?⑸땲??
+  - Kakao 怨꾩젙?대㈃ Kakao Admin Key濡?移댁뭅???곌껐 ?댁젣瑜??쒕룄?⑸땲??
+- `KAKAO_ADMIN_KEY`??Supabase secret?쇰줈 ?ㅼ젙?섏뿀?듬땲??
+- `WITHDRAWAL_HASH_SECRET`??Supabase secret?쇰줈 ?ㅼ젙?섏뿀?듬땲??
+- ?ш????쒗븳? ?꾩옱 ?댁젣?섏뼱 ?덉뒿?덈떎.
+- 異뷀썑 寃????ぉ: 踰ㅼ튂留덊궧??李멸퀬???ш????좎삁湲고븳 ?놁쓬/7??30??議곌굔遺 ?쒗븳 以??뺤콉 寃곗젙.
 
 ## Edge Functions
 
-현재 추가된 함수:
+?꾩옱 異붽????⑥닔:
 
-- `ensure-app-user`: 로그인 후 `app_users`와 `auth_identities`를 보장하고 `{ mid, uid }`를 반환합니다.
-- `withdraw-account`: 탈퇴 기록, 상태 변경, 카카오 연결 해제를 처리합니다.
-- `check-rejoin-block`: 현재는 재가입 제한 비활성 상태로 `{ blocked: false }`를 반환합니다.
+- `ensure-app-user`: 濡쒓렇????`app_users`? `auth_identities`瑜?蹂댁옣?섍퀬 `{ mid, uid }`瑜?諛섑솚?⑸땲??
+- `withdraw-account`: ?덊눜 湲곕줉, ?곹깭 蹂寃? 移댁뭅???곌껐 ?댁젣瑜?泥섎━?⑸땲??
+- `check-rejoin-block`: ?꾩옱???ш????쒗븳 鍮꾪솢???곹깭濡?`{ blocked: false }`瑜?諛섑솚?⑸땲??
 
-## 데이터 수집 기준
+## ?곗씠???섏쭛 湲곗?
 
-Kakao에서 명시적으로 요청하는 동의 범위는 현재 `account_email`입니다.
+Kakao?먯꽌 紐낆떆?곸쑝濡??붿껌?섎뒗 ?숈쓽 踰붿쐞???꾩옱 `account_email`?낅땲??
 
-카카오/소셜에서 들어오는 주요 값:
+移댁뭅???뚯뀥?먯꽌 ?ㅼ뼱?ㅻ뒗 二쇱슂 媛?
 
-- 이메일: Supabase Auth `auth.users.email` 및 필요 시 profile 계열 데이터에 반영될 수 있습니다.
-- 카카오 provider user id: 원문 저장하지 않고 `provider_user_id_hash`로 해시 저장합니다.
-- 닉네임/프로필 이미지: 카카오 설정과 Supabase metadata에 따라 들어올 수 있으나, 우리 코드에서 필수 범위로 강제한 것은 이메일입니다.
+- ?대찓?? Supabase Auth `auth.users.email` 諛??꾩슂 ??profile 怨꾩뿴 ?곗씠?곗뿉 諛섏쁺?????덉뒿?덈떎.
+- 移댁뭅??provider user id: ?먮Ц ??ν븯吏 ?딄퀬 `provider_user_id_hash`濡??댁떆 ??ν빀?덈떎.
+- ?됰꽕???꾨줈???대?吏: 移댁뭅???ㅼ젙怨?Supabase metadata???곕씪 ?ㅼ뼱?????덉쑝?? ?곕━ 肄붾뱶?먯꽌 ?꾩닔 踰붿쐞濡?媛뺤젣??寃껋? ?대찓?쇱엯?덈떎.
 
-## 최근 DB 변경
+## 理쒓렐 DB 蹂寃?
+- `app_users.id` 怨꾩뿴 UUID 以묒떖 援ъ“瑜?`mid` ?쒕쾲 ID 以묒떖?쇰줈 ?ъ젙由ы뻽?듬땲??
+- `primary_auth_user_id` ?섎???`uid`濡??듭씪?덉뒿?덈떎.
+- `account_withdrawals.id`??UUID?먯꽌 ?쒕쾲 `bigint identity`濡?蹂寃쏀뻽?듬땲??
+- `auth_identities.id`???쒓굅?덉뒿?덈떎.
+- `notices.id`???꾩쭅 UUID?낅땲?? ?ъ슜?먭? ?쒕쾲 蹂寃쎌쓣 ?붿껌?덉쑝誘濡??ㅼ쓬 ?묒뾽?쇰줈 ?⑥븘 ?덉뒿?덈떎.
 
-- `app_users.id` 계열 UUID 중심 구조를 `mid` 순번 ID 중심으로 재정리했습니다.
-- `primary_auth_user_id` 의미는 `uid`로 통일했습니다.
-- `account_withdrawals.id`는 UUID에서 순번 `bigint identity`로 변경했습니다.
-- `auth_identities.id`는 제거했습니다.
-- `notices.id`는 아직 UUID입니다. 사용자가 순번 변경을 요청했으므로 다음 작업으로 남아 있습니다.
+## 寃利??곹깭
 
-## 검증 상태
+理쒓렐 ?뺤씤 湲곗?:
 
-최근 확인 기준:
+- `frontend`?먯꽌 `npm run lint` ?듦낵.
+- `frontend`?먯꽌 `npm run build` ?듦낵.
+- 鍮뚮뱶??Vite chunk size 寃쎄퀬留??⑥뒿?덈떎.
 
-- `frontend`에서 `npm run lint` 통과.
-- `frontend`에서 `npm run build` 통과.
-- 빌드는 Vite chunk size 경고만 남습니다.
+## ?묒뾽 ?먯튃
 
-## 작업 원칙
-
-- 사용자 응답은 한국어로 간결하게 작성합니다.
-- 긴 답변에는 `AGENTS.md`의 시작/끝 이모지 마커 규칙을 적용합니다.
-- 파일 본문, 긴 stdout, diff, raw 코드를 채팅에 길게 붙이지 않습니다.
-- 로컬 산출물은 가능한 한 `file://` 링크로 보고합니다.
-- 다른 사람이 만든 변경은 되돌리지 않습니다.
+- ?ъ슜???묐떟? ?쒓뎅?대줈 媛꾧껐?섍쾶 ?묒꽦?⑸땲??
+- 湲??듬??먮뒗 `AGENTS.md`???쒖옉/???대え吏 留덉빱 洹쒖튃???곸슜?⑸땲??
+- ?뚯씪 蹂몃Ц, 湲?stdout, diff, raw 肄붾뱶瑜?梨꾪똿??湲멸쾶 遺숈씠吏 ?딆뒿?덈떎.
+- 濡쒖뺄 ?곗텧臾쇱? 媛?ν븳 ??`file://` 留곹겕濡?蹂닿퀬?⑸땲??
+- ?ㅻⅨ ?щ엺??留뚮뱺 蹂寃쎌? ?섎룎由ъ? ?딆뒿?덈떎.

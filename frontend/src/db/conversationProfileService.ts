@@ -13,6 +13,7 @@ export interface ConversationProfilePatch {
   id?: number
   name: string
   description?: string | null
+  avatarUrl?: string | null
   isDefault?: boolean
 }
 
@@ -58,7 +59,7 @@ export const conversationProfileService = {
         userId,
         name: values.name.trim(),
         description: values.description ?? null,
-        avatarUrl: null,
+        avatarUrl: values.avatarUrl ?? null,
         isDefault: Boolean(values.isDefault),
       }
     }
@@ -75,6 +76,7 @@ export const conversationProfileService = {
       mid: userId,
       name: values.name.trim(),
       description: values.description?.trim() || null,
+      avatar_url: values.avatarUrl ?? null,
       is_default: Boolean(values.isDefault),
     }
 
@@ -88,6 +90,24 @@ export const conversationProfileService = {
 
     if (error) throw error
     return toConversationProfile(data as ConversationProfileRow)
+  },
+
+  async remove(userId: string, profileId: number): Promise<void> {
+    if (!supabase) return
+
+    const existing = await this.list(userId)
+    const deleting = existing.find((profile) => profile.id === profileId)
+    if (deleting?.isDefault) {
+      throw new Error('기본 대화 프로필은 삭제할 수 없어요')
+    }
+
+    const { error } = await supabase
+      .from('conversation_profiles')
+      .delete()
+      .eq('id', profileId)
+      .eq('mid', userId)
+
+    if (error) throw error
   },
 
   async ensureDefault(userId: string, name: string): Promise<void> {

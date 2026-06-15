@@ -1,4 +1,4 @@
-import type { User } from '../auth/types'
+﻿import type { User } from '../auth/types'
 import { supabase } from '../auth/supabase'
 
 export type DialogueMode = 'safe' | 'unlimited'
@@ -102,6 +102,7 @@ interface AutoChargeRow {
 export interface ProfilePatch {
   nickname?: string
   username?: string
+  avatarUrl?: string | null
   bio?: string | null
   birthdate?: string | null
   gender?: string | null
@@ -114,7 +115,7 @@ function generatedSocialName(user: User) {
 }
 
 function fallbackProfile(user: User): AppProfile {
-  const nickname = user.nickname && user.nickname !== 'aichat 회원'
+  const nickname = user.nickname && user.nickname !== 'aichat ?뚯썝'
     ? user.nickname
     : generatedSocialName(user)
   const username = user.username || nickname
@@ -124,7 +125,7 @@ function fallbackProfile(user: User): AppProfile {
     nickname,
     username,
     avatarUrl: null,
-    bio: user.bio ?? '자기소개 하기. aichat 하나',
+    bio: user.bio ?? '?먭린?뚭컻 ?섍린. aichat ?섎굹',
     birthdate: user.birthdate ?? null,
     gender: user.gender ?? null,
     onboardingCompleted: false,
@@ -143,7 +144,7 @@ function fallbackSettings(userId: string): UserSettings {
 function fallbackWallet(user: User): WalletSummary {
   return {
     userId: user.id,
-    pieceBalance: user.pieces ?? 0,
+    pieceBalance: 0,
   }
 }
 
@@ -221,6 +222,7 @@ function profilePayload(userId: string, values: ProfilePatch) {
     mid: userId,
     nickname: values.nickname?.trim(),
     username: values.username?.trim(),
+    avatar_url: values.avatarUrl ?? undefined,
     bio: values.bio ?? undefined,
     birthdate: values.birthdate ?? undefined,
     gender: values.gender ?? undefined,
@@ -277,7 +279,7 @@ export const profileService = {
       membershipResult,
       autoChargeResult,
     ] = await Promise.all([
-      supabase.from('profiles').select('*').eq('mid', user.id).maybeSingle(),
+      supabase.from('social_profiles').select('*').eq('mid', user.id).maybeSingle(),
       supabase.from('user_settings').select('*').eq('mid', user.id).maybeSingle(),
       supabase.from('wallets').select('*').eq('mid', user.id).maybeSingle(),
       supabase
@@ -302,16 +304,14 @@ export const profileService = {
       supabase.from('auto_charge_settings').select('enabled,threshold_pieces').eq('mid', user.id).maybeSingle(),
     ])
 
-    if (profileResult.error || settingsResult.error || walletResult.error) return fallback
-
     return {
-      profile: profileResult.data ? toProfile(profileResult.data as ProfileRow, user) : fallback.profile,
-      settings: settingsResult.data ? toSettings(settingsResult.data as SettingsRow) : fallback.settings,
-      wallet: walletResult.data ? toWallet(walletResult.data as WalletRow) : fallback.wallet,
+      profile: profileResult.error || !profileResult.data ? fallback.profile : toProfile(profileResult.data as ProfileRow, user),
+      settings: settingsResult.error || !settingsResult.data ? fallback.settings : toSettings(settingsResult.data as SettingsRow),
+      wallet: walletResult.error || !walletResult.data ? fallback.wallet : toWallet(walletResult.data as WalletRow),
       identity: identityResult.error || !identityResult.data ? fallback.identity : toIdentity(identityResult.data as IdentityRow),
       follows: {
-        followers: followersResult.error ? fallback.follows.followers : followersResult.count ?? 0,
-        following: followingResult.error ? fallback.follows.following : followingResult.count ?? 0,
+        followers: followersResult.error ? 0 : followersResult.count ?? 0,
+        following: followingResult.error ? 0 : followingResult.count ?? 0,
       },
       membership: membershipResult.error ? fallback.membership : toMembership((membershipResult.data as MembershipRow | null) ?? null),
       autoCharge: autoChargeResult.error ? fallback.autoCharge : toAutoCharge((autoChargeResult.data as AutoChargeRow | null) ?? null),
@@ -320,13 +320,13 @@ export const profileService = {
 
   async upsertProfile(userId: string, values: ProfilePatch): Promise<void> {
     if (!supabase) return
-    const { error } = await supabase.from('profiles').upsert(profilePayload(userId, values), { onConflict: 'mid' })
+    const { error } = await supabase.from('social_profiles').upsert(profilePayload(userId, values), { onConflict: 'mid' })
     if (error) throw error
   },
 
   async ensureSocialProfile(user: User, values: ProfilePatch = {}): Promise<void> {
     if (!supabase) return
-    const { error } = await supabase.from('profiles').upsert(socialProfilePayload(user, values), { onConflict: 'mid' })
+    const { error } = await supabase.from('social_profiles').upsert(socialProfilePayload(user, values), { onConflict: 'mid' })
     if (error) throw error
   },
 

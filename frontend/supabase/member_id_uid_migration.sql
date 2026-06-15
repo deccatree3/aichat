@@ -1,9 +1,9 @@
-drop policy if exists "admins can read admin users" on public.admin_users;
+﻿drop policy if exists "admins can read admin users" on public.admin_users;
 drop policy if exists "users can read own app user" on public.app_users;
 drop policy if exists "users can read own auth identities" on public.auth_identities;
-drop policy if exists "users can read own profile" on public.profiles;
-drop policy if exists "users can insert own profile" on public.profiles;
-drop policy if exists "users can update own profile" on public.profiles;
+drop policy if exists "users can read own social profile" on public.social_profiles;
+drop policy if exists "users can insert own social profile" on public.social_profiles;
+drop policy if exists "users can update own social profile" on public.social_profiles;
 drop policy if exists "users can manage own settings" on public.user_settings;
 drop policy if exists "users can manage own notification preferences" on public.notification_preferences;
 drop policy if exists "users can manage own blocks" on public.user_blocks;
@@ -60,12 +60,12 @@ begin
   end loop;
 end $$;
 
-alter table public.profiles add column if not exists mid bigint;
-update public.profiles set mid = app_users.mid from public.app_users where profiles.user_id = app_users.id and profiles.mid is null;
-alter table public.profiles drop constraint if exists profiles_pkey;
-alter table public.profiles drop column if exists user_id;
-alter table public.profiles alter column mid set not null;
-alter table public.profiles add constraint profiles_pkey primary key (mid);
+alter table public.social_profiles add column if not exists mid bigint;
+update public.social_profiles set mid = app_users.mid from public.app_users where social_profiles.user_id = app_users.id and social_profiles.mid is null;
+alter table public.social_profiles drop constraint if exists social_profiles_pkey;
+alter table public.social_profiles drop column if exists user_id;
+alter table public.social_profiles alter column mid set not null;
+alter table public.social_profiles add constraint social_profiles_pkey primary key (mid);
 
 alter table public.user_settings add column if not exists mid bigint;
 update public.user_settings set mid = app_users.mid from public.app_users where user_settings.user_id = app_users.id and user_settings.mid is null;
@@ -132,7 +132,7 @@ alter table public.faqs rename column created_by to created_by_uid;
 alter table public.faqs rename column updated_by to updated_by_uid;
 alter table public.contact_replies rename column author_id to author_uid;
 
-alter table public.profiles add constraint profiles_mid_fkey foreign key (mid) references public.app_users(mid) on delete cascade;
+alter table public.social_profiles add constraint social_profiles_mid_fkey foreign key (mid) references public.app_users(mid) on delete cascade;
 alter table public.user_settings add constraint user_settings_mid_fkey foreign key (mid) references public.app_users(mid) on delete cascade;
 alter table public.notification_preferences add constraint notification_preferences_mid_fkey foreign key (mid) references public.app_users(mid) on delete cascade;
 alter table public.user_blocks add constraint user_blocks_mid_fkey foreign key (mid) references public.app_users(mid) on delete cascade;
@@ -187,19 +187,19 @@ create policy "users can read own auth identities"
 on public.auth_identities for select
 using (mid = public.current_mid() or public.is_admin());
 
-drop policy if exists "users can read own profile" on public.profiles;
-create policy "users can read own profile"
-on public.profiles for select
+drop policy if exists "users can read own social profile" on public.social_profiles;
+create policy "users can read own social profile"
+on public.social_profiles for select
 using (mid = public.current_mid() or public.is_admin());
 
-drop policy if exists "users can insert own profile" on public.profiles;
-create policy "users can insert own profile"
-on public.profiles for insert
+drop policy if exists "users can insert own social profile" on public.social_profiles;
+create policy "users can insert own social profile"
+on public.social_profiles for insert
 with check (mid = public.current_mid());
 
-drop policy if exists "users can update own profile" on public.profiles;
-create policy "users can update own profile"
-on public.profiles for update
+drop policy if exists "users can update own social profile" on public.social_profiles;
+create policy "users can update own social profile"
+on public.social_profiles for update
 using (mid = public.current_mid())
 with check (mid = public.current_mid());
 
