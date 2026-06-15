@@ -4,6 +4,7 @@ import LoginSheet from './components/LoginSheet'
 import HomePage from './pages/HomePage'
 import LoginPage from './pages/LoginPage'
 import MyPage from './pages/MyPage'
+import ProfileEditPage from './pages/ProfileEditPage'
 import MorePage from './pages/MorePage'
 import AccountSettingsPage from './pages/AccountSettingsPage'
 import CustomerCenterPage from './pages/CustomerCenterPage'
@@ -42,6 +43,7 @@ export default function App() {
         <Route path="/auth/callback" element={<AuthCallbackPage />} />
         <Route path="/signup" element={<SignupProfilePage />} />
         <Route path="/my-page" element={<MyPage onLoginRequired={() => setSheetOpen(true)} />} />
+        <Route path="/profile/edit" element={<ProfileEditPage />} />
         <Route path="/more" element={<MorePage onLoginRequired={() => setSheetOpen(true)} />} />
         <Route path="/settings/account" element={<AccountSettingsPage />} />
         <Route path="/withdrawal" element={<WithdrawalPage />} />

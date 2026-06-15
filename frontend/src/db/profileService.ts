@@ -108,8 +108,15 @@ export interface ProfilePatch {
   onboardingCompleted?: boolean
 }
 
+function generatedSocialName(user: User) {
+  const suffix = user.mid || Number(user.id) || ''
+  return `aichat${suffix}`
+}
+
 function fallbackProfile(user: User): AppProfile {
-  const nickname = user.nickname || 'aichat 회원'
+  const nickname = user.nickname && user.nickname !== 'aichat 회원'
+    ? user.nickname
+    : generatedSocialName(user)
   const username = user.username || nickname
 
   return {
@@ -221,6 +228,17 @@ function profilePayload(userId: string, values: ProfilePatch) {
   }
 }
 
+function socialProfilePayload(user: User, values: ProfilePatch = {}) {
+  const nickname = values.nickname?.trim() || generatedSocialName(user)
+  const username = values.username?.trim() || nickname
+
+  return profilePayload(user.id, {
+    ...values,
+    nickname,
+    username,
+  })
+}
+
 function settingsPayload(userId: string, values: Partial<Omit<UserSettings, 'userId'>>) {
   return {
     mid: userId,
@@ -303,6 +321,12 @@ export const profileService = {
   async upsertProfile(userId: string, values: ProfilePatch): Promise<void> {
     if (!supabase) return
     const { error } = await supabase.from('profiles').upsert(profilePayload(userId, values), { onConflict: 'mid' })
+    if (error) throw error
+  },
+
+  async ensureSocialProfile(user: User, values: ProfilePatch = {}): Promise<void> {
+    if (!supabase) return
+    const { error } = await supabase.from('profiles').upsert(socialProfilePayload(user, values), { onConflict: 'mid' })
     if (error) throw error
   },
 

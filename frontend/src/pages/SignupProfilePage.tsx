@@ -2,6 +2,7 @@ import { useMemo, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useAuth } from '../auth/AuthContext'
 import { profileService } from '../db/profileService'
+import { conversationProfileService } from '../db/conversationProfileService'
 
 type SignupStep = 'name' | 'details'
 type Gender = 'female' | 'male' | ''
@@ -42,13 +43,14 @@ export default function SignupProfilePage() {
   const completeSignup = () => {
     if (user) {
       const birthdate = `${year}-${month.padStart(2, '0')}-${day.padStart(2, '0')}`
-      void profileService.upsertProfile(user.id, {
-        nickname: name,
-        username: user.username || name,
-        birthdate,
-        gender,
-        onboardingCompleted: true,
-      })
+      void Promise.all([
+        profileService.ensureSocialProfile(user, {
+          birthdate,
+          gender,
+          onboardingCompleted: true,
+        }),
+        conversationProfileService.ensureDefault(user.id, name),
+      ])
     }
     navigate('/my-page')
   }

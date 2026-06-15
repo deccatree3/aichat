@@ -90,7 +90,7 @@ export default function MyPage({ onLoginRequired }: Props) {
         </div>
         <div className="mypage-profile__actions">
           <button>프로필 공유</button>
-          <button>프로필 편집</button>
+          <Link to="/profile/edit">프로필 편집</Link>
         </div>
       </section>
 
